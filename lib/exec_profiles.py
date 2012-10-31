@@ -193,7 +193,7 @@ class InterpreterProfile(BaseProfile):
     dirname = os.path.join(self.config.get("directories", "source"),
         self._filename_gen())
     filename = os.path.join(dirname, lang_conf["filename"])
-    os.mkdir(dirname)
+    os.makedirs(dirname)
     try:
       f = file(filename, "w")
       try:
