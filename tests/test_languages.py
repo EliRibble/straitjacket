@@ -146,6 +146,3 @@ class StraitJacketTests(TestCase):
     self.assertEquals(self.sj_run("java",
         "class Main { public static void main(String[] args) throws Exception "
         "{ Thread.sleep(20000); } }"), (-9, "runtime_timelimit"))
-
-
-if __name__ == "__main__": unittest.main()
