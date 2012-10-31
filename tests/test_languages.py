@@ -20,7 +20,11 @@ import os
 import sys
 sys.path.append( os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..' ) ) )
 
-import server, unittest, urllib, json, re
+import server
+import unittest
+import urllib
+import json
+import re
 
 __author__ = "JT Olds"
 __copyright__ = "Copyright 2011 Instructure, Inc."
