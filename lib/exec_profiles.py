@@ -187,8 +187,8 @@ class InterpreterProfile(BaseProfile):
     dirname = os.path.join(self.config.get("directories", "source"),
         self._filename_gen())
     filename = os.path.join(dirname, lang_conf["filename"])
+    os.mkdir(dirname)
     try:
-      os.mkdir(dirname)
       f = file(filename, "w")
       try:
         f.write(source)
