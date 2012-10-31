@@ -187,7 +187,7 @@ class StraitJacket(object):
 
   def _safe_language(self, config_file, lang_config, language):
     return safe_language_check(config_file, language,
-        lambda source, stdin: self._real_run(lang_config, source, stdin),
+        functools.partial( self._real_run, lang_config),
         self.log_method)
 
   def _get_exec_profile(self, profile_name):
