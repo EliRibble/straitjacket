@@ -17,7 +17,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import time, os, subprocess, threading, base64, shutil
+import time
+import os
+import subprocess
+import threading
+import base64
+import shutil
+
 try:
   import LibAppArmor
 except ImportError:
