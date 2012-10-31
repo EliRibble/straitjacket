@@ -16,22 +16,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-import os
-import sys
-sys.path.append( os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..' ) ) )
 
 import server
 import urllib
 import json
 import re
-
-__author__ = "JT Olds"
-__copyright__ = "Copyright 2011 Instructure, Inc."
-__license__ = "AGPLv3"
-__email__ = "jt@instructure.com"
-
-wrapper = server.straitjacket.StraitJacket(server.DEFAULT_CONFIG_DIR)
-webapp = server.webapp(wrapper)
 
 def execute(self, data, expected_stdout, expected_stderr,
         expected_exitstatus, expected_error):
@@ -52,22 +41,26 @@ def execute(self, data, expected_stdout, expected_stderr,
     except:
         raise Exception, "unexpected output: %s" % r
 
-def testBadLanguage(self):
-    self.assertEquals(webapp.request("/execute", "POST",
-            urllib.urlencode({
-        "language": "non-existent-language",
-        "source": "",
-        "stdin": ""})).status, "400 Bad Request")
+def _execute(webapp, params):
+    return webapp.request('/execute', 'POST', urllib.urlencode(params))
 
-def testTooLongExecution(self):
-    self.execute({
-            "language": "ruby1.8",
-            "source": "sleep 20\n",
-            "stdin": ""},
-        "",
-        "",
-        -9,
-        "runtime_timelimit")
+def test_bad_language(webapp):
+    response = _execute({
+        'language'  : 'non-existent-language',
+        'source'    : '',
+        'stdin'     : ''})
+    assert response.status == '400 Bad Request'
+
+def test_too_long_execution(webapp):
+    response = _execute_and_parse({
+        'langauge'  : 'ruby1.8',
+        'source'    : 'sleep 20',
+        'stdin'     : ''
+    })
+    assert response['stdout'] == ''
+    assert response['stderr'] == ''
+    assert response['return_code'] == -9
+    assert response['status'] == 'runtime_timelimit'
 
 def testOkayExecution(self):
     self.execute({
