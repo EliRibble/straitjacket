@@ -17,7 +17,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os, ConfigParser, re, sys, exec_profiles, subprocess
+import os
+import ConfigParser
+import re
+import sys
+import exec_profiles
+import subprocess
+import functools
 
 __author__ = "JT Olds"
 __copyright__ = "Copyright 2011 Instructure, Inc."
