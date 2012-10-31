@@ -195,11 +195,8 @@ class InterpreterProfile(BaseProfile):
     filename = os.path.join(dirname, lang_conf["filename"])
     os.makedirs(dirname)
     try:
-      f = file(filename, "w")
-      try:
+      with open(filename, 'w') as f:
         f.write(source)
-      finally:
-        f.close()
       if lang_conf.has_key("interpretation_command"):
         command = eval(lang_conf["interpretation_command"])(filename)
       else:
