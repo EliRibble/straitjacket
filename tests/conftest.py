@@ -18,6 +18,7 @@ def webapp():
 
 def pytest_addoption(parser):
     parser.addoption('--languages', action='store', dest='languages', default=None, help="Run only the provided language")
+    parser.addoption('--test', action='store', dest='test', default=None, help='Run only the specified test')
 
 def pytest_generate_tests(metafunc):
     if 'language' in metafunc.fixturenames:
@@ -29,8 +30,11 @@ def pytest_generate_tests(metafunc):
         if 'test_number' in metafunc.fixturenames:
             test_params = []
             for language in test_languages:
-                for i in range(len(language.tests)):
-                    test_params.append((language, i))
+                if metafunc.config.option.test is not None:
+                    test_params.append((language, int(metafunc.config.option.test)))
+                else:
+                    for i in range(len(language.tests)):
+                        test_params.append((language, i))
             metafunc.parametrize(('language', 'test_number'), test_params)
         else:
             metafunc.parametrize('language', languages)
