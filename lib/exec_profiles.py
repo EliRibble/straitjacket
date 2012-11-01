@@ -37,6 +37,14 @@ __email__ = "jt@instructure.com"
 class Error_(Exception): pass
 class AppArmorProtectionFailure(Error_): pass
 
+class ExecutionResults(object):
+    def __init__(self, stdout, stderr, returncode, runtime, error):
+        self.stdout     = stdout
+        self.stderr     = stderr
+        self.returncode = returncode
+        self.runtime    = runtime
+        self.error      = error
+
 def aa_change_onexec(profile):
   if LibAppArmor is None or LibAppArmor.aa_change_onexec(profile) != 0:
     raise AppArmorProtectionFailure, ("failed to switch to apparmor profile %s"
@@ -93,7 +101,7 @@ class BaseProfile(object):
     else:
       error = ""
 
-    return stdout, stderr, returncode, runtime, error
+    return ExecutionResults(stdout, stderr, returncode, runtime, error)
 
   def _filename_gen(self): return base64.b64encode(os.urandom(42), "_-")
 
@@ -160,7 +168,7 @@ class CompilerProfile(BaseProfile):
           error = "compilation_timelimit"
         else:
           error = "compilation_error"
-        return "", compile_out, returncode, 0.0, error
+        return ExecutionResults("", compile_out, returncode, 0.0, error)
 
       os.rename(compiler_file, executable_file)
 
@@ -258,7 +266,7 @@ class VMProfile(BaseProfile):
           error = "compilation_timelimit"
         else:
           error = "compilation_error"
-        return "", compile_out, returncode, 0.0, error
+        return ExecutionResults("", compile_out, returncode, 0.0, error)
 
       return self._run_user_program(eval(lang_conf["vm_command"])(source_file),
           stdin, self.apparmor_profile(lang_conf, "vm_apparmor_profile"),
