@@ -31,6 +31,6 @@ def _execute(webapp, params):
 
 
 def test_language_tests(language, test_number):
-    assert language.tests[test_number].test()
+    language.tests[test_number].test()
     
     

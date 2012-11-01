@@ -99,7 +99,7 @@ class BaseProfile(object):
     elif returncode != 0:
       error = "runtime_error"
     else:
-      error = ""
+      error = None
 
     return ExecutionResults(stdout, stderr, returncode, runtime, error)
 
