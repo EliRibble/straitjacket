@@ -110,6 +110,31 @@ LanguageTest('test-simple', c_sharp,
     returncode  = 0,
     error       = None)
 
+LanguageTest('test-rlimit', c_sharp,
+    source      = ( 'public class TestRLimit {                  \n'
+                    '  public static void Main() {              \n'
+                    '    int[] numbers = new int[1073741824];   \n'
+                    '  }                                        \n'
+                    '}'),
+    stdout      = '',
+    stderr      = 'System.OutOfMemoryException: Out of memory',
+    returncode  = 1,
+    error       = 'runtime_error')
+
+LanguageTest('test-apparmor', c_sharp,
+    source      = ( 'using System; using System.IO;             \n'
+                    'public class TestAppArmor {                \n'
+                    '   public static void Main() {             \n'
+                    '       TextReader tr = new StreamReader("/etc/passwd");   \n'
+                    '       Console.WriteLine(tr.ReadLine());   \n'
+                    '       tr.Close();                         \n'
+                    '   }                                       \n'
+                    '}'),
+    stdout      = '',
+    stderr      = 'Access to the path "/etc/passwd" is denied.',
+    returncode  = 1,
+    error       = 'runtime_error')
+
 
 def all():
     from lib import languages
