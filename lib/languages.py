@@ -1,4 +1,5 @@
 import subprocess
+import re
 
 from lib import exec_profiles
 import straitjacket_settings
@@ -29,14 +30,14 @@ class Language(object):
 
 class LanguageTest(object):
     def __init__(self, name, language, source, stdout, stderr, returncode, error):
-        self.name       = name
-        self.language   = language
-        self.source     = source
-        self.stdin      = None
-        self.stdout     = stdout
-        self.stderr     = stderr
-        self.returncode = returncode
-        self.error      = error
+        self.name           = name
+        self.language       = language
+        self.source         = source
+        self.stdin          = None
+        self.returncode     = returncode
+        self.error          = error
+        self.stdout_pattern = stdout
+        self.stderr_pattern = stderr
 
         self.language.tests.append(self)
         
@@ -50,12 +51,13 @@ class LanguageTest(object):
     def test(self):
         result = self.language.execute( self.source, self.stdin, None )
         assert self.returncode == result.returncode
-        assert self.stdout     == result.stdout
-        assert self.stderr     == result.stderr
         assert self.error      == result.error
+        assert re.search(self.stdout_pattern, result.stdout)
+        assert re.search(self.stderr_pattern, result.stderr)
 
 bash = Language('Bash', exec_profiles.InterpreterProfile(straitjacket_settings), binary='bash', filename='source.sh')
 LanguageTest('test-simple', bash, source='echo -n hello from bash', stdout='hello from bash', stderr='', returncode=0, error=None)
+LanguageTest('test-apparmor', bash, source='while read line; do echo -e "$line\n"; done < /etc/hosts', stdout='', stderr='line 2: /etc/hosts: Permission denied', returncode=1, error='runtime_error')
 
 def all():
     from lib import languages
