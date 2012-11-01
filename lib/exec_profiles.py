@@ -46,6 +46,9 @@ class ExecutionResults(object):
         self.runtime    = runtime
         self.error      = error
 
+    def __repr__(self):
+        return "Results returncode={0} {1} stdout={2} stderr={3}".format(self.returncode, 'error=' + self.error if self.error else '', self.stdout, self.stderr)
+
 def aa_change_onexec(profile):
   if LibAppArmor is None or LibAppArmor.aa_change_onexec(profile) != 0:
     raise AppArmorProtectionFailure, ("failed to switch to apparmor profile %s"
