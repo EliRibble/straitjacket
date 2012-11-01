@@ -6,13 +6,16 @@ import straitjacket_settings
 
 class Language(object):
     def __init__(self, name, profile, binary, filename, options=None, visible_name=None, version=None, version_switch=None, vm_command=None,
+            apparmor_profile            = None,
             compiler_apparmor_profile   = None,
+            compiled_apparmor_profile   = None,
             vm_apparmor_profile         = None,
             compilation_command         = None,
             interpretation_command      = None
         ):
         self.name                       = name
         self.profile                    = profile
+        self.apparmor_profile           = apparmor_profile
         self.binary                     = binary
         self.filename                   = filename
         self.options                    = options if options else []
@@ -22,6 +25,7 @@ class Language(object):
         self.interpretation_command     = interpretation_command
         self.vm_command                 = vm_command
         self.compiler_apparmor_profile  = compiler_apparmor_profile
+        self.compiled_apparmor_profile  = compiled_apparmor_profile
         self.vm_apparmor_profile        = vm_apparmor_profile
         self.compilation_command        = compilation_command
         self.tests                      = []
@@ -134,6 +138,70 @@ LanguageTest('test-apparmor', c_sharp,
     stderr      = 'Access to the path "/etc/passwd" is denied.',
     returncode  = 1,
     error       = 'runtime_error')
+
+c = Language('C',
+    profile                     = exec_profiles.CompilerProfile(straitjacket_settings),
+    binary                      = 'gcc',
+    apparmor_profile            = 'straitjacket/compiler/default',
+    compiled_apparmor_profile   = 'straitjacket/compiled/default',
+    filename                    = 'source.c',)
+    
+LanguageTest('test-simple', c,
+    source      = ( '#include <stdio.h>                         \n'
+                    'int main(int argc, char** argv) {          \n'
+                    '   printf("c compilation succeeded");      \n'
+                    '   return 0;                               \n'
+                    '}'),
+    stdout      = 'c compilation succeeded',
+    stderr      = '',
+    returncode  = 0,
+    error       = None)
+
+LanguageTest('test-rlimit', c,
+    source      = ( '#include <stdio.h>                         \n'
+                    'int main(int argc, char** argv) {          \n'
+                    '   printf("forked: %d", fork());           \n'
+                    '   return 3;                               \n'
+                    '}'),
+    stdout      = 'forked: -1',
+    stderr      = '',
+    returncode  = 3,
+    error       = 'runtime_error')
+
+LanguageTest('test-apparmor', c,
+    source      = ( '#include <stdio.h>                         \n'
+                    '#include <errno.h>                         \n'
+                    'int main(int argc, char** argv) {          \n'
+                    '   if(fopen("/etc/hosts", "r")) {          \n'
+                    '       printf("opened");                   \n'
+                    '   } else {                                \n'
+                    '       printf("not opened: %d", errno);    \n'
+                    '   }                                       \n'
+                    '   return 0;                               \n'
+                    '}'),
+    stdout      = 'not opened: 13',
+    stderr      = '',
+    returncode  = 0,
+    error       = None)
+
+LanguageTest('test-argv0', c,
+    source      = ( '#include <stdio.h>                 \n'
+                    'int main(int argc, char** argv) {  \n'
+                    '   printf("%s", argv[0]);          \n'
+                    '   return 0;                       \n'
+                    '}'),
+    stdout      = 'straitjacket-binary',
+    stderr      = '',
+    returncode  = 0,
+    error       = None)
+
+LanguageTest('test-includesafe', c,
+    source      = ( '#include "/etc/hosts"                          \n'
+                    'int main(int argc, char** argv) { return 0; }'),
+    stdout      = '',
+    stderr      = 'fatal error: /etc/hosts: Permission denied\n',
+    returncode  = 1,
+    error       = 'compilation_error')
 
 
 def all():

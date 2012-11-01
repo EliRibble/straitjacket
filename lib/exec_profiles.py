@@ -109,7 +109,7 @@ class BaseProfile(object):
 
   def _filename_gen(self): return base64.b64encode(os.urandom(42), "_-")
 
-  def run(self, lang_conf, source, stdin, custom_timelimit=None):
+  def run(self, language, source, stdin, custom_timelimit=None):
     raise NotImplementedError
 
 
@@ -117,31 +117,29 @@ class CompilerProfile(BaseProfile):
 
   def __init__(self, config): BaseProfile.__init__(self, config)
 
-  def run(self, lang_conf, source, stdin, custom_timelimit=None):
+  def run(self, language, source, stdin, custom_timelimit=None):
     source_dir = os.path.join(self.config.DIRECTORIES['source'], self._filename_gen())
-    source_file = os.path.join(source_dir, lang_conf["filename"])
+    source_file = os.path.join(source_dir, language.filename)
     compiler_file = os.path.join(self.config.DIRECTORIES["compiler"], self._filename_gen())
     executable_file = os.path.join(self.config.DIRECTORIES["execution"], self._filename_gen())
     try:
       os.mkdir(source_dir)
-      f = file(source_file, "w")
-      try:
+      with open(source_file, 'w') as f:
         f.write(source)
-      finally:
-        f.close()
+      logging.debug("Wrote the following source to %s: %s", source_file, source)
 
       completed = []
       compile_start_time = time.time()
-
+      logging.debug("Compiling with profile %s", language.apparmor_profile)
       def compiler_preexec():
         os.environ["TMPDIR"] = self.config.DIRECTORIES["compiler"]
         aa_change_onexec(language.apparmor_profile)
 
-      if lang_conf.has_key("compilation_command"):
-        command = eval(lang_conf["compilation_command"])(source_file,
-            compiler_file)
+      if language.compilation_command:
+        command = language.compilation_command(source_file, compiler_file)
       else:
-        command = [lang_conf["binary"], "-o", compiler_file, source_file]
+        command = [language.binary, "-o", compiler_file, source_file]
+      logging.debug("Executing command %s", command)
       proc = subprocess.Popen(command, stdin=None, stdout=subprocess.PIPE,
           stderr=subprocess.STDOUT, close_fds=True, preexec_fn=compiler_preexec)
       kill_thread = threading.Thread(target=self._kill, args=(proc.pid,
@@ -168,8 +166,8 @@ class CompilerProfile(BaseProfile):
 
       os.rename(compiler_file, executable_file)
 
-      if lang_conf.has_key("compiled_apparmor_profile"):
-        compiled_profile = lang_conf["compiled_apparmor_profile"]
+      if language.compiled_apparmor_profile:
+        compiled_profile = language.compiled_apparmor_profile
       else:
         compiled_profile = self.config.APPARMOR_PROFILES["compiled"]
 
