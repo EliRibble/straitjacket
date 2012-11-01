@@ -41,8 +41,7 @@ INDEX_HTML = """
 </form>
 """
 
-def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR,
-    skip_language_checks=False):
+def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=False):
   if not wrapper:
     wrapper = straitjacket.StraitJacket(config_dir,
         skip_language_checks=skip_language_checks)
