@@ -1,10 +1,13 @@
 import os
 import sys
+import logging
 import pytest
 sys.path.append( os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..' ) ) )
 
 import server
 from lib import languages
+
+logging.getLogger().addHandler(logging.StreamHandler())
 
 @pytest.fixture
 def webapp():
