@@ -46,10 +46,9 @@ class BaseProfile(object):
 
   def __init__(self, config):
     self.config = config
-    self.max_runtime = config.getint("general", "max_runtime")
 
   def _kill(self, pid, completed, max_runtime=None):
-    if max_runtime is None: max_runtime = self.max_runtime
+    max_runtime = max_runtime if max_runtime else self.config.MAX_RUNTIME
     for _ in xrange(max(int(max_runtime), 1)):
       if completed: return
       time.sleep(1)
@@ -72,7 +71,7 @@ class BaseProfile(object):
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         close_fds=True, preexec_fn=preexec_fn)
     kill_thread = threading.Thread(target=self._kill, args=(proc.pid, completed,
-        min(self.max_runtime - time_used, custom_timelimit)))
+        min(self.config.MAX_RUNTIME - time_used, custom_timelimit)))
 
     kill_thread.start()
     returncode = None
@@ -101,8 +100,8 @@ class BaseProfile(object):
   def run(self, lang_conf, source, stdin, custom_timelimit=None):
     raise NotImplementedError
 
-  def apparmor_profile(self, lang_conf, profile_name="apparmor_profile"):
-    profile = lang_conf.get(profile_name, "").strip()
+  def apparmor_profile(self, language, profile_name="apparmor_profile"):
+    profile = getattr(language, profile_name, "").strip()
     if len(profile) > 0: return profile
     return self.default_apparmor_profile()
 
@@ -115,10 +114,10 @@ class CompilerProfile(BaseProfile):
   def __init__(self, config): BaseProfile.__init__(self, config)
 
   def run(self, lang_conf, source, stdin, custom_timelimit=None):
-    source_dir = os.path.join(self.config.get("directories", "source"), self._filename_gen())
+    source_dir = os.path.join(self.config.DIRECTORIES['source'], self._filename_gen())
     source_file = os.path.join(source_dir, lang_conf["filename"])
-    compiler_file = os.path.join(self.config.get("directories", "compiler"), self._filename_gen())
-    executable_file = os.path.join(self.config.get("directories", "execution"), self._filename_gen())
+    compiler_file = os.path.join(self.config.DIRECTORIES["compiler"], self._filename_gen())
+    executable_file = os.path.join(self.config.DIRECTORIES["execution"], self._filename_gen())
     try:
       os.mkdir(source_dir)
       f = file(source_file, "w")
@@ -131,7 +130,7 @@ class CompilerProfile(BaseProfile):
       compile_start_time = time.time()
 
       def compiler_preexec():
-        os.environ["TMPDIR"] = self.config.get("directories", "compiler")
+        os.environ["TMPDIR"] = self.config.DIRECTORIES["compiler"]
         aa_change_onexec(self.apparmor_profile(lang_conf))
 
       if lang_conf.has_key("compilation_command"):
@@ -168,8 +167,7 @@ class CompilerProfile(BaseProfile):
       if lang_conf.has_key("compiled_apparmor_profile"):
         compiled_profile = lang_conf["compiled_apparmor_profile"]
       else:
-        compiled_profile = self.config.get("default-apparmor-profiles",
-            "compiled")
+        compiled_profile = self.config.APPARMOR_PROFILES["compiled"]
 
       return self._run_user_program(["straitjacket-binary"], stdin,
           compiled_profile, time.time() - compile_start_time, executable_file,
@@ -180,32 +178,33 @@ class CompilerProfile(BaseProfile):
       if os.path.exists(executable_file): os.unlink(executable_file)
 
   def default_apparmor_profile(self):
-    return self.config.get("default-apparmor-profiles", "compiler")
+    return self.config.APPARMOR_PROFILES["compiler"]
 
 class InterpreterProfile(BaseProfile):
 
   def __init__(self, config): BaseProfile.__init__(self, config)
 
-  def run(self, lang_conf, source, stdin, custom_timelimit=None):
-    dirname = os.path.join(self.config.get("directories", "source"),
-        self._filename_gen())
-    filename = os.path.join(dirname, lang_conf["filename"])
+  def run(self, language, source, stdin, custom_timelimit=None):
+    dirname = os.path.join(self.config.DIRECTORIES["source"], self._filename_gen())
+    filename = os.path.join(dirname, language.filename)
     os.makedirs(dirname)
     try:
       with open(filename, 'w') as f:
         f.write(source)
-      if lang_conf.has_key("interpretation_command"):
-        command = eval(lang_conf["interpretation_command"])(filename)
+      if language.interpretation_command:
+        command = eval(language.interpretation_command)(filename)
       else:
-        command = [lang_conf["binary"], filename]
-      return self._run_user_program(command, stdin,
-          self.apparmor_profile(lang_conf), custom_timelimit=custom_timelimit)
+        command = [language.binary, filename]
+      return self._run_user_program(command,
+             stdin,
+             self.apparmor_profile(language),
+             custom_timelimit=custom_timelimit)
 
     finally:
       shutil.rmtree(dirname)
 
   def default_apparmor_profile(self):
-    return self.config.get("default-apparmor-profiles", "interpreter")
+    return self.config.APPARMOR_PROFILES["interpreter"]
 
 
 class VMProfile(BaseProfile):
@@ -213,7 +212,7 @@ class VMProfile(BaseProfile):
   def __init__(self, config): BaseProfile.__init__(self, config)
 
   def run(self, lang_conf, source, stdin, custom_timelimit=None):
-    source_dir = os.path.join(self.config.get("directories", "source"),
+    source_dir = os.path.join(self.config.DIRECTORIES["source"],
         self._filename_gen())
     source_file = os.path.join(source_dir, lang_conf["filename"])
     try:
@@ -228,7 +227,7 @@ class VMProfile(BaseProfile):
       compile_start_time = time.time()
 
       def compiler_preexec():
-        os.environ["TMPDIR"] = self.config.get("directories", "compiler")
+        os.environ["TMPDIR"] = self.config.DIRECTORIES["compiler"]
         os.chdir(source_dir)
         aa_change_onexec(self.apparmor_profile(lang_conf,
             "compiler_apparmor_profile"))
@@ -269,4 +268,4 @@ class VMProfile(BaseProfile):
       shutil.rmtree(source_dir)
 
   def default_apparmor_profile(self):
-    return self.config.get("default-apparmor-profiles", "compiled")
+    return self.config.APPARMOR_PROFILES["compiled"]

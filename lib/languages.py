@@ -1,6 +1,7 @@
 import subprocess
 
 from lib import exec_profiles
+import straitjacket_settings
 
 class Language(object):
     def __init__(self, name, profile, binary, filename, options=None, visible_name=None, version=None, version_switch=None):
@@ -12,6 +13,7 @@ class Language(object):
         self.visible_name   = visible_name if visible_name else '{0} ({1})'.format(name, binary + ' '.join(self.options))
         self.version_switch = version_switch if version_switch else "--version"
         self.version        = version if version else self.get_version()
+        self.interpretation_command = None
         self.tests          = []
 
     def get_version(self):
@@ -42,7 +44,7 @@ class LanguageTest(object):
         result = self.language.execute( self.source, self.stdin, None )
         import pytest;pytest.set_trace()
 
-bash = Language('Bash', exec_profiles.InterpreterProfile, binary='bash', filename='source.sh')
+bash = Language('Bash', exec_profiles.InterpreterProfile(straitjacket_settings), binary='bash', filename='source.sh')
 LanguageTest('test-simple', bash, source='echo -n hello from bash', stdout='hello from bash', stderr='', exitstatus=0, error=None)
 
 def all():
