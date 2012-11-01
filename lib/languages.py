@@ -5,17 +5,25 @@ from lib import exec_profiles
 import straitjacket_settings
 
 class Language(object):
-    def __init__(self, name, profile, binary, filename, options=None, visible_name=None, version=None, version_switch=None):
-        self.name           = name
-        self.profile        = profile
-        self.binary         = binary
-        self.filename       = filename
-        self.options        = options if options else []
-        self.visible_name   = visible_name if visible_name else '{0} ({1})'.format(name, binary + ' '.join(self.options))
-        self.version_switch = version_switch if version_switch else "--version"
-        self.version        = version if version else self.get_version()
-        self.interpretation_command = None
-        self.tests          = []
+    def __init__(self, name, profile, binary, filename, options=None, visible_name=None, version=None, version_switch=None, vm_command=None,
+            compiler_apparmor_profile   = None,
+            vm_apparmor_profile         = None,
+            compilation_command         = None
+        ):
+        self.name                       = name
+        self.profile                    = profile
+        self.binary                     = binary
+        self.filename                   = filename
+        self.options                    = options if options else []
+        self.visible_name               = visible_name if visible_name else '{0} ({1})'.format(name, binary + ' '.join(self.options))
+        self.version_switch             = version_switch if version_switch else "--version"
+        self.version                    = version if version else self.get_version()
+        self.interpretation_command     = None
+        self.vm_command                 = vm_command
+        self.compiler_apparmor_profile  = compiler_apparmor_profile
+        self.vm_apparmor_profile        = vm_apparmor_profile
+        self.compilation_command        = None
+        self.tests                      = []
 
     def get_version(self):
         proc = subprocess.Popen([self.binary, self.version_switch], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -79,6 +87,28 @@ LanguageTest('test-rlimit', bash,
      stderr     = 'fork: retry: No child processes',
      returncode = 254,
      error      = 'runtime_error')
+
+c_sharp = Language('C#',
+    profile                     = exec_profiles.VMProfile(straitjacket_settings),
+    binary                      = 'gmcs',
+    filename                    = 'source.cs',
+    version_switch              = '--version',
+    compilation_command         = lambda source: ["mono", "/usr/lib/mono/2.0/gmcs.exe", "-out:main.exe", source],
+    vm_command                  = lambda source: ['env', "LD_PRELOAD=/var/local/straitjacket/lib/getpwuid_r_hijack.so", "mono", "main.exe"],
+    compiler_apparmor_profile   = 'straitjacket/compiler/csharp',
+    vm_apparmor_profile         = 'straitjacket/compiled/csharp'
+)
+LanguageTest('test-simple', c_sharp,
+    source      = ( 'public class HelloWorld {                              \n'
+                    '  public static void Main() {                          \n'
+                    '    System.Console.WriteLine("hey c# world, sup?");    \n'
+                    '  }                                                    \n'
+                    '}'),
+    stdout      = 'hey c# world, sup?\n',
+    stderr      = '',
+    returncode  = 0,
+    error       = None)
+
 
 def all():
     from lib import languages

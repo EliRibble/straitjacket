@@ -23,6 +23,7 @@ import subprocess
 import threading
 import base64
 import shutil
+import logging
 
 try:
   import LibAppArmor
@@ -219,10 +220,10 @@ class VMProfile(BaseProfile):
 
   def __init__(self, config): BaseProfile.__init__(self, config)
 
-  def run(self, lang_conf, source, stdin, custom_timelimit=None):
+  def run(self, language, source, stdin, custom_timelimit=None):
     source_dir = os.path.join(self.config.DIRECTORIES["source"],
         self._filename_gen())
-    source_file = os.path.join(source_dir, lang_conf["filename"])
+    source_file = os.path.join(source_dir, language.filename)
     try:
       os.mkdir(source_dir)
       f = file(source_file, "w")
@@ -234,16 +235,17 @@ class VMProfile(BaseProfile):
       completed = []
       compile_start_time = time.time()
 
+      logging.info("Switching to apparmor profile %s", self.apparmor_profile(language, 'compiler_apparmor_profile'))
       def compiler_preexec():
         os.environ["TMPDIR"] = self.config.DIRECTORIES["compiler"]
         os.chdir(source_dir)
-        aa_change_onexec(self.apparmor_profile(lang_conf,
+        aa_change_onexec(self.apparmor_profile(language,
             "compiler_apparmor_profile"))
 
-      if lang_conf.has_key("compilation_command"):
-        command = eval(lang_conf["compilation_command"])(source_file)
+      if language.compilation_command:
+        command = language.compilation_command(source_file)
       else:
-        command = [lang_conf["binary"], source_file]
+        command = [language.binary, source_file]
       proc = subprocess.Popen(command, stdin=None, stdout=subprocess.PIPE,
           stderr=subprocess.STDOUT, close_fds=True, preexec_fn=compiler_preexec)
       kill_thread = threading.Thread(target=self._kill, args=(proc.pid,
@@ -268,8 +270,8 @@ class VMProfile(BaseProfile):
           error = "compilation_error"
         return ExecutionResults("", compile_out, returncode, 0.0, error)
 
-      return self._run_user_program(eval(lang_conf["vm_command"])(source_file),
-          stdin, self.apparmor_profile(lang_conf, "vm_apparmor_profile"),
+      return self._run_user_program(language.vm_command(source_file),
+          stdin, self.apparmor_profile(language, "vm_apparmor_profile"),
           time.time() - compile_start_time, chdir=source_dir,
           custom_timelimit=custom_timelimit)
     finally:
