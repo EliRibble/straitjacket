@@ -8,7 +8,8 @@ class Language(object):
     def __init__(self, name, profile, binary, filename, options=None, visible_name=None, version=None, version_switch=None, vm_command=None,
             compiler_apparmor_profile   = None,
             vm_apparmor_profile         = None,
-            compilation_command         = None
+            compilation_command         = None,
+            interpretation_command      = None
         ):
         self.name                       = name
         self.profile                    = profile
@@ -18,11 +19,11 @@ class Language(object):
         self.visible_name               = visible_name if visible_name else '{0} ({1})'.format(name, binary + ' '.join(self.options))
         self.version_switch             = version_switch if version_switch else "--version"
         self.version                    = version if version else self.get_version()
-        self.interpretation_command     = None
+        self.interpretation_command     = interpretation_command
         self.vm_command                 = vm_command
         self.compiler_apparmor_profile  = compiler_apparmor_profile
         self.vm_apparmor_profile        = vm_apparmor_profile
-        self.compilation_command        = None
+        self.compilation_command        = compilation_command
         self.tests                      = []
 
     def get_version(self):
