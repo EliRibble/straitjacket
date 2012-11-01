@@ -45,7 +45,7 @@ class LanguageTest(object):
         return  self.returncode == result.returncode and 
                 self.stdout     == result.stdout and 
                 self.stderr     == result.stderr and
-                self.error      == result.error:
+                self.error      == result.error
 
 bash = Language('Bash', exec_profiles.InterpreterProfile(straitjacket_settings), binary='bash', filename='source.sh')
 LanguageTest('test-simple', bash, source='echo -n hello from bash', stdout='hello from bash', stderr='', returncode=0, error=None)
