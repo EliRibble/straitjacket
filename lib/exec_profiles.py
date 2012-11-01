@@ -111,7 +111,8 @@ class BaseProfile(object):
 
   def apparmor_profile(self, language, profile_name="apparmor_profile"):
     profile = getattr(language, profile_name, "").strip()
-    if len(profile) > 0: return profile
+    if len(profile) > 0:
+        return profile
     return self.default_apparmor_profile()
 
   def default_apparmor_profile(self):
