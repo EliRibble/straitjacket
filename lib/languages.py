@@ -68,6 +68,17 @@ LanguageTest('test-apparmor', bash,
      stderr     = 'line 2: /etc/hosts: Permission denied',
      returncode = 1,
      error      = 'runtime_error')
+LanguageTest('test-rlimit', bash,
+     source     = (
+        'fork() {                   \n'
+        '   echo "hi from child"    \n'
+        '}                          \n'
+        'fork & fork & fork &       \n'
+        'wait'),
+     stdout     = '',
+     stderr     = 'fork: retry: No child processes',
+     returncode = 254,
+     error      = 'runtime_error')
 
 def all():
     from lib import languages
