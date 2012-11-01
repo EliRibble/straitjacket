@@ -112,15 +112,6 @@ class BaseProfile(object):
   def run(self, lang_conf, source, stdin, custom_timelimit=None):
     raise NotImplementedError
 
-  def apparmor_profile(self, language, profile_name="apparmor_profile"):
-    profile = getattr(language, profile_name, "").strip()
-    if len(profile) > 0:
-        return profile
-    return self.default_apparmor_profile()
-
-  def default_apparmor_profile(self):
-    raise NotImplementedError
-
 
 class CompilerProfile(BaseProfile):
 
@@ -144,7 +135,7 @@ class CompilerProfile(BaseProfile):
 
       def compiler_preexec():
         os.environ["TMPDIR"] = self.config.DIRECTORIES["compiler"]
-        aa_change_onexec(self.apparmor_profile(lang_conf))
+        aa_change_onexec(language.apparmor_profile)
 
       if lang_conf.has_key("compilation_command"):
         command = eval(lang_conf["compilation_command"])(source_file,
@@ -239,17 +230,17 @@ class VMProfile(BaseProfile):
       completed = []
       compile_start_time = time.time()
 
-      logging.info("Switching to apparmor profile %s", self.apparmor_profile(language, 'compiler_apparmor_profile'))
+      logging.info("Switching to apparmor profile %s", language.compiler_apparmor_profile)
       def compiler_preexec():
         os.environ["TMPDIR"] = self.config.DIRECTORIES["compiler"]
         os.chdir(source_dir)
-        aa_change_onexec(self.apparmor_profile(language,
-            "compiler_apparmor_profile"))
+        aa_change_onexec(language.compiler_apparmor_profile)
 
       if language.compilation_command:
         command = language.compilation_command(source_file)
       else:
         command = [language.binary, source_file]
+      logging.debug("Compiling with: %s", command)
       proc = subprocess.Popen(command, stdin=None, stdout=subprocess.PIPE,
           stderr=subprocess.STDOUT, close_fds=True, preexec_fn=compiler_preexec)
       kill_thread = threading.Thread(target=self._kill, args=(proc.pid,
@@ -275,11 +266,11 @@ class VMProfile(BaseProfile):
         return ExecutionResults("", compile_out, returncode, 0.0, error)
 
       return self._run_user_program(language.vm_command(source_file),
-          stdin, self.apparmor_profile(language, "vm_apparmor_profile"),
+          stdin, language.vm_apparmor_profile,
           time.time() - compile_start_time, chdir=source_dir,
           custom_timelimit=custom_timelimit)
     finally:
-      shutil.rmtree(source_dir)
+      pass #shutil.rmtree(source_dir)
 
   def default_apparmor_profile(self):
     return self.config.APPARMOR_PROFILES["compiled"]

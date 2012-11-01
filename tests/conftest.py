@@ -8,6 +8,7 @@ import server
 from lib import languages
 
 logging.getLogger().addHandler(logging.StreamHandler())
+logging.getLogger().setLevel(logging.DEBUG)
 
 @pytest.fixture
 def webapp():

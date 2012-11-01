@@ -90,7 +90,7 @@ LanguageTest('test-rlimit', bash,
 
 c_sharp = Language('C#',
     profile                     = exec_profiles.VMProfile(straitjacket_settings),
-    binary                      = 'gmcs',
+    binary                      = '/usr/bin/gmcs',
     filename                    = 'source.cs',
     version_switch              = '--version',
     compilation_command         = lambda source: ["mono", "/usr/lib/mono/2.0/gmcs.exe", "-out:main.exe", source],
@@ -104,7 +104,7 @@ LanguageTest('test-simple', c_sharp,
                     '    System.Console.WriteLine("hey c# world, sup?");    \n'
                     '  }                                                    \n'
                     '}'),
-    stdout      = 'hey c# world, sup?\n',
+    stdout      = r'hey c# world, sup\?\n',
     stderr      = '',
     returncode  = 0,
     error       = None)
