@@ -83,9 +83,8 @@ class StraitJacket(object):
     return parsed
 
   def _get_all_languages(self):
-    return sorted((match.group(1) for match in (
-              _LANG_MATCH.search(dir_) for dir_ in os.listdir(self.config_dir))
-            if match))
+    from lib import languages
+    return languages.all()
 
   def __init__(self, config_dir, log_method=None, skip_language_checks=False):
     self.log_method = log_method or stderr_log
@@ -102,16 +101,23 @@ class StraitJacket(object):
       self.cached_versions.add_section("versions")
       self.cached_versions_needs_flush = True
 
-    self.enabled_languages = {}
+    
     self.exec_profiles = {}
 
     languages = self._get_all_languages()
 
-    if not skip_language_checks:
-      self.log_method("Initializing %d languages." % len(languages))
+    if skip_language_checks:
+        self.languages = {language.name: language for language in languages}
 
+    self.languages = {}
     for language in languages:
-      self._initialize_language(language, skip_language_checks)
+        if not language.is_enabled():
+            continue
+        for test in language.tests:
+            if not test.passes():
+                continue
+        self.languages[language.name] = language
+
 
     if self.cached_versions_needs_flush:
       try:
@@ -123,62 +129,7 @@ class StraitJacket(object):
 
     if not skip_language_checks:
       self.log_method("Initialized %d languages, %d enabled." % (
-          len(languages), len(self.enabled_languages)))
-
-  def _initialize_language(self, language, skip_language_checks):
-    config_file = self._read_config_file("lang-%s.conf" % language)
-    language_config = dict(config_file.items("general"))
-
-    language_config["execution_profile"] = self._get_exec_profile(
-        language_config["execution_profile"])
-
-    options = language_config.get("options", "").strip()
-    if len(options) > 0: language_config["options"] = options.split(" ")
-    else: language_config["options"] = []
-
-    if "visible_name" not in language_config:
-      language_config["visible_name"] = "%s (%s)" % (
-          language_config["name"], " ".join([language_config["binary"]] +
-              language_config["options"]))
-
-    if skip_language_checks:
-      if self.cached_versions.has_option("versions", language):
-        language_config["version"] = self.cached_versions.get("versions",
-            language)
-        self.enabled_languages[language] = language_config
-      return
-
-    try:
-      language_config["version"] = [x for x in (x.strip()
-          for x in subprocess.Popen([language_config["binary"],
-          language_config.get("version_switch", "--version")],
-          stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0
-          ].split("\n")) if len(x) > 0][0]
-    except:
-      language_config["version"] = "Unknown version"
-
-    self.log_method("Initializing %s - %s" % (language_config["visible_name"],
-        language_config["version"]))
-
-    if not self._safe_language(config_file, language_config, language):
-      if self.cached_versions.has_option("versions", language):
-        self.cached_versions.remove_option("versions", language)
-        self.cached_versions_needs_flush = True
-      return
-
-    if not self.cached_versions_needs_flush:
-      if self.cached_versions.has_option("versions", language):
-        if self.cached_versions.get("versions", language) != language_config[
-            "version"]:
-          self.cached_versions_needs_flush = True
-      else:
-        self.cached_versions_needs_flush = True
-
-    if self.cached_versions_needs_flush:
-      self.cached_versions.set("versions", language,
-          language_config["version"])
-
-    self.enabled_languages[language] = language_config
+          len(languages), len(self.languages)))
 
   def _safe_language(self, config_file, lang_config, language):
     return safe_language_check(config_file, language,
@@ -197,10 +148,8 @@ class StraitJacket(object):
     return self.exec_profiles[profile_name]
 
   def run(self, language, source, stdin, custom_timelimit=None):
-    if language not in self.enabled_languages:
+    if language not in self.languages:
       raise InputError, "invalid language"
-    return self._real_run(self.enabled_languages[language], source, stdin,
+    return self._real_run(self.languages[language], source, stdin,
         custom_timelimit)
 
-  def _real_run(self, conf, source, stdin, custom_timelimit=None):
-    return conf["execution_profile"].run(conf, source, stdin, custom_timelimit)

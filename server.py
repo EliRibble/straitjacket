@@ -48,9 +48,9 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
 
   index_html = INDEX_HTML % {"languages": "\n".join(
       ('<option value="%s">%s - %s</option>' % (lang,
-       wrapper.enabled_languages[lang]["visible_name"],
-       wrapper.enabled_languages[lang]["version"])
-       for lang in sorted(wrapper.enabled_languages)))}
+       wrapper.languages[lang].visible_name,
+       wrapper.languages[lang].version)
+       for lang in sorted(wrapper.languages.keys())))}
 
   class index:
     def GET(self):
