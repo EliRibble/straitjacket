@@ -48,14 +48,14 @@ def execute(self, data, expected_stdout, expected_stderr,
 def _execute(webapp, params):
     return webapp.request('/execute', 'POST', urllib.urlencode(params))
 
-def test_bad_language(webapp):
-    response = _execute({
+def test_bad_language(language, webapp):
+    response = _execute(webapp, {
         'language'  : 'non-existent-language',
         'source'    : '',
         'stdin'     : ''})
     assert response.status == '400 Bad Request'
 
-def test_too_long_execution(webapp):
+def test_too_long_execution(language, webapp):
     response = _execute_and_parse({
         'langauge'  : 'ruby1.8',
         'source'    : 'sleep 20',
@@ -66,7 +66,7 @@ def test_too_long_execution(webapp):
     assert response['return_code'] == -9
     assert response['status'] == 'runtime_timelimit'
 
-def testOkayExecution(self):
+def testOkayExecution(language, webapp):
     self.execute({
             "language": "ruby1.8",
             "source": "sleep 10\n",
@@ -76,7 +76,7 @@ def testOkayExecution(self):
         0,
         "")
 
-def testLimitedExecution(self):
+def testLimitedExecution(language, webapp):
     self.execute({
             "language": "ruby1.8",
             "source": "sleep 10\n",
@@ -87,7 +87,7 @@ def testLimitedExecution(self):
         -9,
         "runtime_timelimit")
 
-def testOkayLimitedExecution(self):
+def testOkayLimitedExecution(language, webapp):
     self.execute({
             "language": "ruby1.8",
             "source": "sleep 1\n",
@@ -104,7 +104,7 @@ def sj_run(self, lang, source):
             custom_timelimit=1.0)
     return (exitstatus, error)
 
-def testCompilerProfileErrors(self):
+def testCompilerProfileErrors(language, webapp):
     self.assertEquals(wrapper.enabled_languages["c"][
             "execution_profile"].__class__.__name__, "CompilerProfile")
     self.assertEquals(self.sj_run("c",
@@ -117,7 +117,7 @@ def testCompilerProfileErrors(self):
             "#include <time.h>\nint main(int argc, char** argv) { "
             "sleep(20); return 0; }"), (-9, "runtime_timelimit"))
 
-def testInterpreterProfileErrors(self):
+def testInterpreterProfileErrors(language, webapp):
     self.assertEquals(wrapper.enabled_languages["python"][
             "execution_profile"].__class__.__name__, "InterpreterProfile")
     self.assertEquals(self.sj_run("python",
@@ -127,7 +127,7 @@ def testInterpreterProfileErrors(self):
     self.assertEquals(self.sj_run("python",
             "import time\ntime.sleep(20)"), (-9, "runtime_timelimit"))
 
-def testVMProfileErrors(self):
+def testVMProfileErrors(language, webapp):
     self.assertEquals(wrapper.enabled_languages["java"][
             "execution_profile"].__class__.__name__, "VMProfile")
     self.assertEquals(self.sj_run("java",
