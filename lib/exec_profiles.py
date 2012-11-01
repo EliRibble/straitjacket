@@ -115,13 +115,10 @@ class CompilerProfile(BaseProfile):
   def __init__(self, config): BaseProfile.__init__(self, config)
 
   def run(self, lang_conf, source, stdin, custom_timelimit=None):
-    source_dir = os.path.join(self.config.get("directories", "source"),
-        self._filename_gen())
+    source_dir = os.path.join(self.config.get("directories", "source"), self._filename_gen())
     source_file = os.path.join(source_dir, lang_conf["filename"])
-    compiler_file = os.path.join(self.config.get("directories", "compiler"),
-        self._filename_gen())
-    executable_file = os.path.join(self.config.get("directories", "execution"),
-        self._filename_gen())
+    compiler_file = os.path.join(self.config.get("directories", "compiler"), self._filename_gen())
+    executable_file = os.path.join(self.config.get("directories", "execution"), self._filename_gen())
     try:
       os.mkdir(source_dir)
       f = file(source_file, "w")
