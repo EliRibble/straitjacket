@@ -26,75 +26,8 @@ import urllib
 import json
 import re
 
-def execute(self, data, expected_stdout, expected_stderr, expected_exitstatus, expected_error):
-    response = webapp.request("/execute", "POST", urllib.urlencode(data))
-    self.assertEquals(response.status, "200 OK")
-    r = json.loads(response.data)
-    try:
-        if type(expected_stdout) in (str, unicode):
-            if r["stdout"] != expected_stdout: raise Exception
-        else:
-            if not expected_stdout.search(r["stdout"]): raise Exception
-        if type(expected_stderr) in (str, unicode):
-            if r["stderr"] != expected_stderr: raise Exception
-        else:
-            if not expected_stderr.search(r["stderr"]): raise Exception
-        if r["exitstatus"] != expected_exitstatus: raise Exception
-    except:
-        raise Exception, "unexpected output: %s" % r
-
 def _execute(webapp, params):
     return webapp.request('/execute', 'POST', urllib.urlencode(params))
-
-def test_bad_language(language, webapp):
-    response = _execute(webapp, {
-        'language'  : 'non-existent-language',
-        'source'    : '',
-        'stdin'     : ''})
-    assert response.status == '400 Bad Request'
-
-def test_too_long_execution(language, webapp):
-    response = _execute_and_parse({
-        'langauge'  : 'ruby1.8',
-        'source'    : 'sleep 20',
-        'stdin'     : ''
-    })
-    assert response['stdout'] == ''
-    assert response['stderr'] == ''
-    assert response['return_code'] == -9
-    assert response['status'] == 'runtime_timelimit'
-
-def testOkayExecution(language, webapp):
-    self.execute({
-            "language": "ruby1.8",
-            "source": "sleep 10\n",
-            "stdin": ""},
-        "",
-        "",
-        0,
-        "")
-
-def testLimitedExecution(language, webapp):
-    self.execute({
-            "language": "ruby1.8",
-            "source": "sleep 10\n",
-            "stdin": "",
-            "timelimit": "1.5"},
-        "",
-        "",
-        -9,
-        "runtime_timelimit")
-
-def testOkayLimitedExecution(language, webapp):
-    self.execute({
-            "language": "ruby1.8",
-            "source": "sleep 1\n",
-            "stdin": "",
-            "timelimit": "2.5"},
-        "",
-        "",
-        0,
-        "")
 
 
 def sj_run(self, lang, source):
