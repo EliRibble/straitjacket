@@ -26,10 +26,8 @@ import urllib
 import json
 import re
 
-def execute(self, data, expected_stdout, expected_stderr,
-        expected_exitstatus, expected_error):
-    response = webapp.request("/execute", "POST",
-            urllib.urlencode(data))
+def execute(self, data, expected_stdout, expected_stderr, expected_exitstatus, expected_error):
+    response = webapp.request("/execute", "POST", urllib.urlencode(data))
     self.assertEquals(response.status, "200 OK")
     r = json.loads(response.data)
     try:
