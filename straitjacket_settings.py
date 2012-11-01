@@ -1,9 +1,9 @@
 MAX_RUNTIME = 15
 DIRECTORIES = {
     'temp_root' : '/var/local/straitjacket/tmp',
-    'source'    : '%(temp_root)s/source',
-    'compiler'  : '%(temp_root)s/compiler',
-    'execution' : '%(temp_root)s/execute'
+    'source'    : '/var/local/straitjacket/tmp/source',
+    'compiler'  : '/var/local/straitjacket/tmp/compiler',
+    'execution' : '/var/local/straitjacket/tmp/execute'
 }
 
 APPARMOR_PROFILES = {
