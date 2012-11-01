@@ -28,24 +28,27 @@ class Language(object):
         return self.profile.run(self, source, stdin, custom_timelimit=timelimit)
 
 class LanguageTest(object):
-    def __init__(self, name, language, source, stdout, stderr, exitstatus, error):
+    def __init__(self, name, language, source, stdout, stderr, returncode, error):
         self.name       = name
         self.language   = language
         self.source     = source
         self.stdin      = None
         self.stdout     = stdout
         self.stderr     = stderr
-        self.exitstatus = exitstatus
+        self.returncode = returncode
         self.error      = error
 
         self.language.tests.append(self)
         
     def passes(self):
         result = self.language.execute( self.source, self.stdin, None )
-        import pytest;pytest.set_trace()
+        return  self.returncode == result.returncode and 
+                self.stdout     == result.stdout and 
+                self.stderr     == result.stderr and
+                self.error      == result.error:
 
 bash = Language('Bash', exec_profiles.InterpreterProfile(straitjacket_settings), binary='bash', filename='source.sh')
-LanguageTest('test-simple', bash, source='echo -n hello from bash', stdout='hello from bash', stderr='', exitstatus=0, error=None)
+LanguageTest('test-simple', bash, source='echo -n hello from bash', stdout='hello from bash', stderr='', returncode=0, error=None)
 
 def all():
     from lib import languages
