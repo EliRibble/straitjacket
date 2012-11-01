@@ -90,4 +90,5 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
 
   return app
 
-if __name__ == "__main__": webapp().run()
+if __name__ == "__main__":
+    webapp().run()
