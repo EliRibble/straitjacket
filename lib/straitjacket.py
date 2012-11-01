@@ -17,7 +17,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os, ConfigParser, re, sys, exec_profiles, subprocess
+import os
+import ConfigParser
+import re
+import sys
+import exec_profiles
+import subprocess
+import functools
 
 __author__ = "JT Olds"
 __copyright__ = "Copyright 2011 Instructure, Inc."
@@ -181,7 +187,7 @@ class StraitJacket(object):
 
   def _safe_language(self, config_file, lang_config, language):
     return safe_language_check(config_file, language,
-        lambda source, stdin: self._real_run(lang_config, source, stdin),
+        functools.partial( self._real_run, lang_config),
         self.log_method)
 
   def _get_exec_profile(self, profile_name):

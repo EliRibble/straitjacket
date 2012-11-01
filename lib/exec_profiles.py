@@ -17,7 +17,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import time, os, subprocess, threading, base64, shutil
+import time
+import os
+import subprocess
+import threading
+import base64
+import shutil
+
 try:
   import LibAppArmor
 except ImportError:
@@ -187,13 +193,10 @@ class InterpreterProfile(BaseProfile):
     dirname = os.path.join(self.config.get("directories", "source"),
         self._filename_gen())
     filename = os.path.join(dirname, lang_conf["filename"])
+    os.makedirs(dirname)
     try:
-      os.mkdir(dirname)
-      f = file(filename, "w")
-      try:
+      with open(filename, 'w') as f:
         f.write(source)
-      finally:
-        f.close()
       if lang_conf.has_key("interpretation_command"):
         command = eval(lang_conf["interpretation_command"])(filename)
       else:
