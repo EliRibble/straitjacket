@@ -65,9 +65,9 @@ class BaseProfile(object):
       os.kill(pid, 9)
       completed.append("killed")
 
-  def _run_user_program(self, user_program, stdin, aa_profile, time_used=0,
-      executable=None, chdir=None, custom_timelimit=None):
-    if custom_timelimit == None: custom_timelimit = float('inf')
+  def _run_user_program(self, user_program, stdin, aa_profile, time_used=0, executable=None, chdir=None, custom_timelimit=None):
+    if custom_timelimit == None:
+      custom_timelimit = float('inf')
     completed = []
     runtime = None
     start_time = time.time()
