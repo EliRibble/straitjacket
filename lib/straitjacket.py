@@ -25,11 +25,6 @@ import exec_profiles
 import subprocess
 import functools
 
-__author__ = "JT Olds"
-__copyright__ = "Copyright 2011 Instructure, Inc."
-__license__ = "AGPLv3"
-__email__ = "jt@instructure.com"
-
 class Error_(Exception): pass
 class InputError(Error_): pass
 class ConfigError(Error_): pass
