@@ -41,11 +41,18 @@ class LanguageTest(object):
         self.language.tests.append(self)
         
     def passes(self):
+        try:
+            self.test()
+            return True
+        except AssertionError:
+            return False
+
+    def test(self):
         result = self.language.execute( self.source, self.stdin, None )
-        return  self.returncode == result.returncode and \
-                self.stdout     == result.stdout and \
-                self.stderr     == result.stderr and \
-                self.error      == result.error
+        assert self.returncode == result.returncode
+        assert self.stdout     == result.stdout
+        assert self.stderr     == result.stderr
+        assert self.error      == result.error
 
 bash = Language('Bash', exec_profiles.InterpreterProfile(straitjacket_settings), binary='bash', filename='source.sh')
 LanguageTest('test-simple', bash, source='echo -n hello from bash', stdout='hello from bash', stderr='', returncode=0, error=None)
