@@ -118,3 +118,16 @@ def all():
         if isinstance(item, Language):
             found.append(item)
     return found
+
+def get(language_name):
+    from lib import languages
+    try:
+        return getattr(languages, language_name)
+    except AttributeError:
+        for language in all():
+            if language.name == language_name:
+                return language
+        raise Exception("No language named '{0}' found".format(language_name))
+    except TypeError:
+        return (get(n) for n in language_name)
+        
