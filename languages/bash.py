@@ -1,9 +1,12 @@
 from languages.base import Language, LanguageTest
+from lib import exec_profiles
+import straitjacket_settings
 
 bash = Language('Bash',
-    exec_profiles.InterpreterProfile(straitjacket_settings),
-    binary='bash',
-    filename='source.sh')
+    profile             = exec_profiles.InterpreterProfile(straitjacket_settings),
+    apparmor_profile    = 'straitjacket/interpreter/default',
+    binary              = 'bash',
+    filename            = 'source.sh')
     
 LanguageTest('test-simple', bash,
      source     = 'echo -n hello from bash',

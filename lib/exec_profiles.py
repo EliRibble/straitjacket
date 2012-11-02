@@ -199,7 +199,7 @@ class InterpreterProfile(BaseProfile):
         command = [language.binary, filename]
       return self._run_user_program(command,
              stdin,
-             self.apparmor_profile(language),
+             language.apparmor_profile,
              custom_timelimit=custom_timelimit)
 
     finally:
