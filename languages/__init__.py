@@ -17,11 +17,13 @@ def _import_submodule(name):
     setattr(languages, name, getattr(module, name))
     
 def all():
+    import languages
+    import languages.base
     _import_submodules()
     found = []
     for key in dir(languages):
         item = getattr(languages, key)
-        if isinstance(item, Language):
+        if isinstance(item, languages.base.Language):
             found.append(item)
     return found
 
