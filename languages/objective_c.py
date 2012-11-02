@@ -20,3 +20,50 @@ LanguageTest('test-simple', objective_c,
     stderr      = '',
     returncode  = 0,
     error       = None)
+
+LanguageTest('test-rlimit', objective_c,
+    source      = ( '#include <stdio.h>                         \n'
+                    'int main(int argc, char** argv) {          \n'
+                    '   printf("forked: %d", fork());           \n'
+                    '   return 3;                               \n'
+                    '}'),
+    stdout      = 'forked: -1',
+    stderr      = '',
+    returncode  = 3,
+    error       = 'runtime_error')
+
+
+LanguageTest('test-apparmor', objective_c,
+    source      = ( '#include <stdio.h>                         \n'
+                    '#include <errno.h>                         \n'
+                    'int main(int argc, char** argv) {          \n'
+                    '   if(fopen("/etc/hosts", "r")) {          \n'
+                    '       printf("opened");                   \n'
+                    '   } else {                                \n'
+                    '       printf("not opened: %d", errno);    \n'
+                    '   }                                       \n'
+                    '   return 0;                               \n'
+                    '}'),
+    stdout      = 'not opened: 13',
+    stderr      = '',
+    returncode  = 0,
+    error       = None)
+
+LanguageTest('test-argv0', objective_c,
+    source      = ( '#include <stdio.h>                 \n'
+                    'int main(int argc, char** argv) {  \n'
+                    '   printf("%s", argv[0]);          \n'
+                    '   return 0;                       \n'
+                    '}'),
+    stdout      = 'straitjacket-binary',
+    stderr      = '',
+    returncode  = 0,
+    error       = None)
+
+LanguageTest('test-includesafe', objective_c,
+    source      = ( '#include "/etc/hosts"                          \n'
+                    'int main(int argc, char** argv) { return 0; }'),
+    stdout      = '',
+    stderr      = 'fatal error: /etc/hosts: Permission denied\n',
+    returncode  = 1,
+    error       = 'compilation_error')
