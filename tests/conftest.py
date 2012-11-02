@@ -5,7 +5,7 @@ import pytest
 sys.path.append( os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..' ) ) )
 
 import server
-from lib import languages
+import languages
 
 logging.getLogger().addHandler(logging.StreamHandler())
 logging.getLogger().setLevel(logging.DEBUG)
