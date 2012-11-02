@@ -6,7 +6,7 @@ def _get_pattern(my_config, section, pattern_name):
     if pattern.endswith('\Z'): pattern = pattern[:-2]
     return pattern
     
-for language in ['d']:
+for language in ['d', 'fortran', 'go', 'guile', 'haskell', 'java', 'javascript', 'lua', 'ocaml', 'perl', 'php', 'python', 'ruby1.8', 'ruby1.9', 'scala', 'scheme']:
     my_config = ConfigParser.SafeConfigParser()
     my_config.read('./config/lang-{0}.conf'.format(language))
     new_test = ''
