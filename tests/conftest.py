@@ -30,6 +30,8 @@ def pytest_generate_tests(metafunc):
         if 'test_number' in metafunc.fixturenames:
             test_params = []
             for language in test_languages:
+                if not language.is_enabled():
+                    continue
                 if metafunc.config.option.test is not None:
                     test_params.append((language, int(metafunc.config.option.test)))
                 else:
