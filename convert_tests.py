@@ -17,13 +17,13 @@ for language in ['d', 'fortran', 'go', 'guile', 'haskell', 'java', 'javascript',
         new_test += "    source      = ( '{:<60}\\n'\n".format(my_config.get(section, 'source').split('\n')[0])
         for source_line in my_config.get(section, 'source').split('\n')[1:]:
             new_test += "                    '{:<60}\\n'\n".format(source_line)
-        new_test += "                  )\n"
-        new_test += "    stdout      = '{0}'\n".format(_get_pattern(my_config, section, 'stdout'))
-        new_test += "    stderr      = '{0}'\n".format(_get_pattern(my_config, section, 'stderr'))
-        new_test += "    returncode  = {0}\n".format(my_config.get(section, 'exitstatus'))
+        new_test += "                  ),\n"
+        new_test += "    stdout      = '{0}',\n".format(_get_pattern(my_config, section, 'stdout'))
+        new_test += "    stderr      = '{0}',\n".format(_get_pattern(my_config, section, 'stderr'))
+        new_test += "    returncode  = {0},\n".format(my_config.get(section, 'exitstatus'))
 
         error = my_config.get(section, 'error')
-        new_test += "    error       = {0}\n".format("'" + error + "'" if error else 'None')
+        new_test += "    error       = {0})\n".format("'" + error + "'" if error else 'None')
         new_test += "\n"
     with open('./config/{0}.py'.format(language), 'w') as f:
         f.write(new_test)
