@@ -194,7 +194,7 @@ class InterpreterProfile(BaseProfile):
       with open(filename, 'w') as f:
         f.write(source)
       if language.interpretation_command:
-        command = eval(language.interpretation_command)(filename)
+        command = language.interpretation_command(filename)
       else:
         command = [language.binary, filename]
       return self._run_user_program(command,
