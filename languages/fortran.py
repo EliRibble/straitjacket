@@ -7,6 +7,8 @@ fortran = Language('Fortran',
     binary              = 'gfortran',
     filename            = 'source.f90',
     apparmor_profile    = 'straitjacket/compiler/default')
+# Disable fortran until I can sort out how to get it working
+fortran.enabled = False
 
 LanguageTest('test-simple', fortran,
     source      = ( 'PRINT *, "yay fortran"                                      \n'

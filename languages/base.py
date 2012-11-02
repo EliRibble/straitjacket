@@ -6,14 +6,24 @@ from lib import exec_profiles
 import straitjacket_settings
 
 class Language(object):
-    def __init__(self, name, profile, binary, filename, options=None, visible_name=None, version=None, version_switch=None, vm_command=None,
+    def __init__(self,
+            name,
+            profile,
+            binary,
+            filename,
+            options                     = None,
+            visible_name                = None,
+            version                     = None,
+            version_switch              = None,
+            vm_command                  = None,
             apparmor_profile            = None,
             compiler_apparmor_profile   = None,
             compiled_apparmor_profile   = None,
             vm_apparmor_profile         = None,
             compilation_command         = None,
-            interpretation_command      = None
+            interpretation_command      = None,
         ):
+        self.enabled                    = True
         self.name                       = name
         self.profile                    = profile
         self.apparmor_profile           = apparmor_profile
@@ -37,7 +47,7 @@ class Language(object):
         return stdout.split('\n')[0]
 
     def is_enabled(self):
-        return True
+        return self.enabled
 
     def execute(self, source, stdin, timelimit=None):
         return self.profile.run(self, source, stdin, custom_timelimit=timelimit)
