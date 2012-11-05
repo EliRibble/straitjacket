@@ -1,0 +1,24 @@
+upstream straitjacket {
+    server 127.0.0.1:8000 fail_timeout=10;
+}
+
+server {
+    listen 80;
+
+    server_name _;
+    
+    include /etc/nginx/proxy.conf;
+
+    location / {
+        proxy_set_header Host $http_host;
+
+        if (!-f $request_filename) {
+            proxy_pass http://straitjacket;
+            break;
+        }
+    }
+
+    location /crossdomain.xml {
+        root /etc/nginx/crossdomain/;
+    }
+}
