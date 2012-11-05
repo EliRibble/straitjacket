@@ -1,19 +1,17 @@
-upstream straitjacket {
-    server 127.0.0.1:8000 fail_timeout=10;
-}
-
 server {
     listen 80;
 
-    server_name _;
+    server_name straitjacket;
     
     include /etc/nginx/proxy.conf;
 
     location / {
         proxy_set_header Host $http_host;
 
+        include uwsgi_params;
+
         if (!-f $request_filename) {
-            proxy_pass http://straitjacket;
+            uwsgi_pass unix:///run/uwsgi/app/straitjacket/socket;
             break;
         }
     }
