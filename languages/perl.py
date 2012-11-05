@@ -5,8 +5,8 @@ import straitjacket_settings
 perl = Language('Perl',
     profile             = exec_profiles.InterpreterProfile(straitjacket_settings),
     binary              = 'perl',
+    version_pattern     = '\(v(?P<version>[\d\.]+)\)',
     filename            = 'source.pl',
-    version             = '5.14.2',
     apparmor_profile    = 'straitjacket/interpreter/default')
 
 LanguageTest('test-simple', perl,

@@ -15,6 +15,7 @@ class Language(object):
             visible_name                = None,
             version                     = None,
             version_switch              = None,
+            version_pattern             = None,
             vm_command                  = None,
             apparmor_profile            = None,
             compiler_apparmor_profile   = None,
@@ -32,6 +33,7 @@ class Language(object):
         self.options                    = options if options else []
         self.visible_name               = visible_name if visible_name else '{0} ({1})'.format(name, binary + ' '.join(self.options))
         self.version_switch             = version_switch if version_switch else "--version"
+        self.version_pattern            = version_pattern
         self._version                   = version
         self.interpretation_command     = interpretation_command
         self.vm_command                 = vm_command
@@ -50,6 +52,10 @@ class Language(object):
     def get_version(self):
         proc = subprocess.Popen([self.binary, self.version_switch], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         stdout, stderr = proc.communicate()
+        if self.version_pattern:
+            m = re.search(self.version_pattern, stdout)
+            if m:
+                return m.group('version')
         return stdout.split('\n')[0]
 
     def is_enabled(self):
