@@ -267,7 +267,7 @@ class VMProfile(BaseProfile):
                     time.time() - compile_start_time, chdir=source_dir,
                     custom_timelimit=custom_timelimit)
         finally:
-            pass #shutil.rmtree(source_dir)
+            shutil.rmtree(source_dir)
 
     def default_apparmor_profile(self):
         return self.config.APPARMOR_PROFILES["compiled"]
