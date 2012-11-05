@@ -17,7 +17,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import web, json, os
+import web
+import json
+import os
 from lib import straitjacket
 
 __author__ = "JT Olds"
