@@ -50,7 +50,7 @@ def test_null_execution(webapp):
     assert response['returncode'] == 0
     assert response['error'] == None
 
-def test_simple_execution(webapp):
+def test_simple_stdout(webapp):
     response = _execute_and_parse(webapp, {
         'language'  : 'Python',
         'source'    : 'print("Hello")',
@@ -58,6 +58,17 @@ def test_simple_execution(webapp):
     })
     assert response['stdout'] == 'Hello\n'
     assert response['stderr'] == ''
+    assert response['returncode'] == 0
+    assert response['error'] == None
+
+def test_simple_stderr(webapp):
+    response = _execute_and_parse(webapp, {
+        'language'  : 'Python',
+        'source'    : 'import sys;sys.stderr.write("This is stderr")',
+        'stdin'     : '',
+    })
+    assert response['stdout'] == ''
+    assert response['stderr'] == 'This is stderr'
     assert response['returncode'] == 0
     assert response['error'] == None
 
@@ -71,3 +82,15 @@ def test_simple_stdin(webapp):
     assert response['stderr'] == ''
     assert response['returncode'] == 0
     assert response['error'] == None
+
+def test_simple_returncode(webapp):
+    response = _execute_and_parse(webapp, {
+        'language'  : 'Python',
+        'source'    : 'import sys;sys.exit(12)',
+        'stdin'     : '',
+    })
+    assert response['stdout'] == ''
+    assert response['stderr'] == ''
+    assert response['returncode'] == 12
+    assert response['error'] == 'runtime_error'
+
