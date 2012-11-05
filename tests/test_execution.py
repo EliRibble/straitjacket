@@ -44,30 +44,30 @@ def test_null_execution(webapp):
         'language'  : 'Python',
         'source'    : '',
         'stdin'     : '',
-        })
+    })
     assert response['stdout'] == ''
     assert response['stderr'] == ''
     assert response['returncode'] == 0
     assert response['error'] == None
 
-def testLimitedExecution(webapp):
-    _execute({
-            "language": "ruby1.8",
-            "source": "sleep 10\n",
-            "stdin": "",
-            "timelimit": "1.5"},
-        "",
-        "",
-        -9,
-        "runtime_timelimit")
+def test_simple_execution(webapp):
+    response = _execute_and_parse(webapp, {
+        'language'  : 'Python',
+        'source'    : 'print("Hello")',
+        'stdin'     : '',
+    })
+    assert response['stdout'] == 'Hello\n'
+    assert response['stderr'] == ''
+    assert response['returncode'] == 0
+    assert response['error'] == None
 
-def testOkayLimitedExecution(webapp):
-    _execute({
-            "language": "ruby1.8",
-            "source": "sleep 1\n",
-            "stdin": "",
-            "timelimit": "2.5"},
-        "",
-        "",
-        0,
-        "")
+def test_simple_stdin(webapp):
+    response = _execute_and_parse(webapp, {
+        'language'  : 'Python',
+        'source'    : 'import sys;print("I read " + sys.stdin.read() + " from stdin")',
+        'stdin'     : 'some input',
+    })
+    assert response['stdout'] == 'I read some input from stdin\n'
+    assert response['stderr'] == ''
+    assert response['returncode'] == 0
+    assert response['error'] == None
