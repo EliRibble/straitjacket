@@ -2,7 +2,7 @@ from languages.base import Language, LanguageTest
 from lib import exec_profiles
 import straitjacket_settings
 
-ruby_18 = Language('Ruby',
+ruby_18 = Language('Ruby 1.8',
     profile             = exec_profiles.InterpreterProfile(straitjacket_settings),
     binary              = 'ruby1.8',
     filename            = 'source.rb',
