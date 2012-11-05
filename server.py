@@ -43,6 +43,16 @@ INDEX_HTML = """
 </form>
 """
 
+class JSONWrapper(object):
+    def __init__(self, json):
+        self.json = json
+
+    def __getattr__(self, name):
+        try:
+            return self.json[name]
+        except KeyError:
+            raise AttributeError
+
 def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=False):
     if not wrapper:
         wrapper = straitjacket.StraitJacket(config_dir, skip_language_checks=skip_language_checks)
@@ -60,21 +70,22 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
 
     class execute:
         def POST(self):
-            web.header('Content-Type', 'text/plain')
-            f = web.input()
-            timelimit = None
-            if f.has_key("timelimit") and len(f.timelimit) > 0:
-                try:
-                    timelimit = float(f.timelimit)
-                except:
-                    pass
+            web.header('Content-Type', 'text/json')
+            data = web.data()
             try:
-                results = wrapper.run(f.language, f.source, f.stdin, custom_timelimit=timelimit)
+                data = JSONWrapper(json.loads(data))
+            except ValueError:
+                data = web.input()
+
+            timelimit = getattr(data, 'timelimit', None)
+
+            try:
+                results = wrapper.run(data.language, data.source, data.stdin, custom_timelimit=timelimit)
                 return json.dumps({
                         "stdout"                : results.stdout,
                         "stderr"                : results.stderr,
-                        "returncode"        : results.returncode,
-                        "time"                    : results.runtime,
+                        "returncode"            : results.returncode,
+                        "time"                  : results.runtime,
                         "error"                 : results.error
                 })
             except straitjacket.InputError:
