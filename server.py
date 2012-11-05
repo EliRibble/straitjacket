@@ -17,7 +17,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import web, json, os
+import web
+import json
+import os
 from lib import straitjacket
 
 __author__ = "JT Olds"
@@ -48,9 +50,9 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
 
   index_html = INDEX_HTML % {"languages": "\n".join(
       ('<option value="%s">%s - %s</option>' % (lang,
-       wrapper.enabled_languages[lang]["visible_name"],
-       wrapper.enabled_languages[lang]["version"])
-       for lang in sorted(wrapper.enabled_languages)))}
+       wrapper.languages[lang].visible_name,
+       wrapper.languages[lang].version)
+       for lang in sorted(wrapper.languages.keys())))}
 
   class index:
     def GET(self):
@@ -66,10 +68,14 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
         try: timelimit = float(f.timelimit)
         except: pass
       try:
-        stdout, stderr, exitstatus, runtime, error = wrapper.run(f.language,
-            f.source, f.stdin, custom_timelimit=timelimit)
-        return json.dumps({"stdout": stdout, "stderr": stderr,
-            "exitstatus": exitstatus, "time": runtime, "error": error})
+        results = wrapper.run(f.language, f.source, f.stdin, custom_timelimit=timelimit)
+        return json.dumps({
+            "stdout"        : results.stdout,
+            "stderr"        : results.stderr,
+            "returncode"    : results.returncode,
+            "time"          : results.runtime,
+            "error"         : results.error
+        })
       except straitjacket.InputError: raise web.badrequest()
 
   class info:
@@ -90,4 +96,5 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
 
   return app
 
-if __name__ == "__main__": webapp().run()
+if __name__ == "__main__":
+    webapp().run()
