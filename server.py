@@ -84,7 +84,6 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
             timelimit = float(timelimit) if timelimit else None
 
             stdin = [data.stdin] if not type(data.stdin) == list else data.stdin
-                
             try:
                 results = wrapper.run(data.language, data.source, data.stdin, custom_timelimit=timelimit)
                 return json.dumps(results)

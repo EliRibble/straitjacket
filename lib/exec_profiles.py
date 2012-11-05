@@ -112,7 +112,7 @@ class CompilerProfile(BaseProfile):
     def __init__(self, config): BaseProfile.__init__(self, config)
 
     def run(self, language, source, stdins, custom_timelimit=None):
-        stdins = [None] if stdins is None else stdins
+        stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
         source_dir = os.path.join(self.config.DIRECTORIES['source'], self._filename_gen())
         source_file = os.path.join(source_dir, language.filename)
         compiler_file = os.path.join(self.config.DIRECTORIES["compiler"], self._filename_gen())
@@ -191,7 +191,7 @@ class InterpreterProfile(BaseProfile):
     def __init__(self, config): BaseProfile.__init__(self, config)
 
     def run(self, language, source, stdins, custom_timelimit=None):
-        stdins = [None] if stdins is None else stdins
+        stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
 
         dirname = os.path.join(self.config.DIRECTORIES["source"], self._filename_gen())
         filename = os.path.join(dirname, language.filename)
@@ -220,7 +220,7 @@ class VMProfile(BaseProfile):
     def __init__(self, config): BaseProfile.__init__(self, config)
 
     def run(self, language, source, stdins, custom_timelimit=None):
-        stdins = [None] if stdins is None else stdins
+        stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
         source_dir = os.path.join(self.config.DIRECTORIES["source"],
                 self._filename_gen())
         source_file = os.path.join(source_dir, language.filename)

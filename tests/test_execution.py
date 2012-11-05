@@ -82,10 +82,13 @@ def test_simple_stdout(webapp, do_json):
         'stdin'     : '',
     })
     assert response == {
-        'status'        : 'success',
-        'stdout'        : 'Hello\n',
-        'stderr'        : '',
-        'returncode'    : 0
+        'status'    : 'success',
+        'runs'      : [{
+            'status'        : 'success',
+            'stdout'        : 'Hello\n',
+            'stderr'        : '',
+            'returncode'    : 0
+        }]
     }
 
 def test_simple_stderr(webapp, do_json):
