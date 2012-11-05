@@ -39,12 +39,12 @@ class Error_(Exception): pass
 class AppArmorProtectionFailure(Error_): pass
 
 class ExecutionResults(object):
-    def __init__(self, stdout, stderr, returncode, runtime, error):
+    def __init__(self, status, stdout, stderr, returncode, runtime):
         self.stdout     = stdout
         self.stderr     = stderr
         self.returncode = returncode
         self.runtime    = runtime
-        self.error      = error
+        self.status     = status
 
     def __repr__(self):
         return "Results returncode={0} {1} stdout={2} stderr={3}".format(self.returncode, 'error=' + self.error if self.error else '', self.stdout, self.stderr)
@@ -99,13 +99,11 @@ class BaseProfile(object):
     if returncode is None: returncode = proc.returncode
 
     if "killed" in completed or runtime > custom_timelimit:
-      error = "runtime_timelimit"
-    elif returncode != 0:
-      error = "runtime_error"
+      status = "timeout"
     else:
-      error = None
+      status = "success"
 
-    return ExecutionResults(stdout, stderr, returncode, runtime, error)
+    return ExecutionResults(status, stdout, stderr, returncode, runtime)
 
   def _filename_gen(self): return base64.b64encode(os.urandom(42), "_-")
 
@@ -159,10 +157,10 @@ class CompilerProfile(BaseProfile):
 
       if returncode != 0:
         if "killed" in completed:
-          error = "compilation_timelimit"
+          status = "compilation timeout"
         else:
-          error = "compilation_error"
-        return ExecutionResults("", compile_out, returncode, 0.0, error)
+          status = "compilation failed"
+        return ExecutionResults(status, "", compile_out, returncode, 0.0)
 
       os.rename(compiler_file, executable_file)
 
@@ -258,10 +256,10 @@ class VMProfile(BaseProfile):
 
       if returncode != 0:
         if "killed" in completed:
-          error = "compilation_timelimit"
+          status = "compilation timeout"
         else:
-          error = "compilation_error"
-        return ExecutionResults("", compile_out, returncode, 0.0, error)
+          status = "compilation failed"
+        return ExecutionResults(status, "", compile_out, returncode, 0.0)
 
       return self._run_user_program(language.vm_command(source_file),
           stdin, language.vm_apparmor_profile,

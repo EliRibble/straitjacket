@@ -10,7 +10,13 @@ def _execute(webapp, do_json, params) :
 def _execute_and_parse(webapp, do_json, params):
     response = _execute(webapp, do_json, params)
     assert response.status == '200 OK'
-    return json.loads(response['data'])
+    # We have no way of testing the time since it is
+    # highly dependent of the system it is run on
+    # so we just make sure that it is present and a float
+    data = json.loads(response['data'])
+    assert float(data['time']) >= 0.0
+    del data['time']
+    return data
 
 def test_bad_language(webapp, do_json):
     response = _execute(webapp, do_json, {
@@ -35,10 +41,12 @@ def test_too_long_execution_default(webapp, do_json):
         'source'    : 'sleep 20',
         'stdin'     : ''
     })
-    assert response['stdout']       == ''
-    assert response['stderr']       == ''
-    assert response['returncode']   == -9
-    assert response['error']        == 'runtime_timelimit'
+    response == {
+        'status'        : 'timeout',
+        'stdout'        : '',
+        'stderr'        : '',
+        'returncode'    : None,
+    }
 
 def test_too_long_execution_custom(webapp, do_json):
     response = _execute_and_parse(webapp, do_json, {
@@ -47,10 +55,12 @@ def test_too_long_execution_custom(webapp, do_json):
         'stdin'     : '',
         'timelimit' : 2
     })
-    assert response['stdout'] == ''
-    assert response['stderr'] == ''
-    assert response['returncode'] == -9
-    assert response['error'] == 'runtime_timelimit'
+    response == {
+        'status'        : 'timeout',
+        'stdout'        : '',
+        'stderr'        : '',
+        'returncode'    : None,
+    }
 
 def test_null_execution(webapp, do_json):
     response = _execute_and_parse(webapp, do_json, {
@@ -58,10 +68,12 @@ def test_null_execution(webapp, do_json):
         'source'    : '',
         'stdin'     : '',
     })
-    assert response['stdout'] == ''
-    assert response['stderr'] == ''
-    assert response['returncode'] == 0
-    assert response['error'] == None
+    assert response == {
+        'status'        : 'success',
+        'stdout'        : '',
+        'stderr'        : '',
+        'returncode'    : 0
+    }
 
 def test_simple_stdout(webapp, do_json):
     response = _execute_and_parse(webapp, do_json, {
@@ -69,10 +81,12 @@ def test_simple_stdout(webapp, do_json):
         'source'    : 'print("Hello")',
         'stdin'     : '',
     })
-    assert response['stdout'] == 'Hello\n'
-    assert response['stderr'] == ''
-    assert response['returncode'] == 0
-    assert response['error'] == None
+    assert response == {
+        'status'        : 'success',
+        'stdout'        : 'Hello\n',
+        'stderr'        : '',
+        'returncode'    : 0
+    }
 
 def test_simple_stderr(webapp, do_json):
     response = _execute_and_parse(webapp, do_json, {
@@ -80,10 +94,12 @@ def test_simple_stderr(webapp, do_json):
         'source'    : 'import sys;sys.stderr.write("This is stderr")',
         'stdin'     : '',
     })
-    assert response['stdout'] == ''
-    assert response['stderr'] == 'This is stderr'
-    assert response['returncode'] == 0
-    assert response['error'] == None
+    assert response == {
+        'status'        : 'success',
+        'stdout'        : '',
+        'stderr'        : 'This is stderr',
+        'returncode'    : 0
+    }
 
 def test_simple_stdin(webapp, do_json):
     response = _execute_and_parse(webapp, do_json, {
@@ -91,10 +107,12 @@ def test_simple_stdin(webapp, do_json):
         'source'    : 'import sys;print("I read " + sys.stdin.read() + " from stdin")',
         'stdin'     : 'some input',
     })
-    assert response['stdout'] == 'I read some input from stdin\n'
-    assert response['stderr'] == ''
-    assert response['returncode'] == 0
-    assert response['error'] == None
+    assert response == {
+        'status'        : 'success',
+        'stdout'        : 'I read some input from stdin\n',
+        'stderr'        : '',
+        'returncode'    : 0
+    }
 
 def test_simple_returncode(webapp, do_json):
     response = _execute_and_parse(webapp, do_json, {
@@ -102,10 +120,12 @@ def test_simple_returncode(webapp, do_json):
         'source'    : 'import sys;sys.exit(12)',
         'stdin'     : '',
     })
-    assert response['stdout'] == ''
-    assert response['stderr'] == ''
-    assert response['returncode'] == 12
-    assert response['error'] == 'runtime_error'
+    assert response == {
+        'status'        : 'success',
+        'stdout'        : '',
+        'stderr'        : '',
+        'returncode'    : 12 
+    }
 
 def test_compiler_error(webapp, do_json):
     response = _execute_and_parse(webapp, do_json, {
@@ -113,8 +133,10 @@ def test_compiler_error(webapp, do_json):
         'source'    : 'invalid',
         'stdin'     : '',
     })
-    assert response['stdout'] == ''
-    assert response['returncode'] == 1
-    assert response['time'] == 0.0
-    assert response['error'] == 'compilation_error'
+    del response['stderr']
+    assert response == {
+        'status'        : 'compilation failed',
+        'stdout'        : '',
+        'returncode'    : 1 
+    }
     

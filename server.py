@@ -20,12 +20,11 @@
 import web
 import json
 import os
+import logging
+
 from lib import straitjacket
 
-__author__ = "JT Olds"
-__copyright__ = "Copyright 2011 Instructure, Inc."
-__license__ = "AGPLv3"
-__email__ = "jt@instructure.com"
+LOGGER = logging.getLogger('server')
 
 DEFAULT_CONFIG_DIR = os.path.join(os.path.realpath(os.path.dirname(__file__)),
         "config")
@@ -83,15 +82,17 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
             try:
                 results = wrapper.run(data.language, data.source, data.stdin, custom_timelimit=timelimit)
                 return json.dumps({
+                        "status"                : results.status,
                         "stdout"                : results.stdout,
                         "stderr"                : results.stderr,
                         "returncode"            : results.returncode,
                         "time"                  : results.runtime,
-                        "error"                 : results.error
                 })
-            except straitjacket.InputError:
+            except straitjacket.InputError as ex:
+                LOGGER.error("Input error: {0}".format(ex))
                 raise web.badrequest()
-            except AttributeError:
+            except AttributeError as ex:
+                LOGGER.error("Attribute error: {0}".format(ex))
                 raise web.badrequest()
 
     class info:
