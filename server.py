@@ -83,15 +83,11 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
             timelimit = getattr(data, 'timelimit', None)
             timelimit = float(timelimit) if timelimit else None
 
+            stdin = [data.stdin] if not type(data.stdin) == list else data.stdin
+                
             try:
                 results = wrapper.run(data.language, data.source, data.stdin, custom_timelimit=timelimit)
-                return json.dumps({
-                        "status"                : results.status,
-                        "stdout"                : results.stdout,
-                        "stderr"                : results.stderr,
-                        "returncode"            : results.returncode,
-                        "time"                  : results.runtime,
-                })
+                return json.dumps(results)
             except straitjacket.InputError as ex:
                 LOGGER.error("Input error: {0}".format(ex))
                 raise web.badrequest()

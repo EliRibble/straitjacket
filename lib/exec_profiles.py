@@ -38,17 +38,6 @@ __email__ = "jt@instructure.com"
 class Error_(Exception): pass
 class AppArmorProtectionFailure(Error_): pass
 
-class ExecutionResults(object):
-        def __init__(self, status, stdout, stderr, returncode, runtime):
-                self.stdout         = stdout
-                self.stderr         = stderr
-                self.returncode = returncode
-                self.runtime        = runtime
-                self.status         = status
-
-        def __repr__(self):
-                return "Results returncode={0} {1} stdout={2} stderr={3}".format(self.returncode, 'error=' + self.error if self.error else '', self.stdout, self.stderr)
-
 def aa_change_onexec(profile):
     if LibAppArmor is None or LibAppArmor.aa_change_onexec(profile) != 0:
         raise AppArmorProtectionFailure, ("failed to switch to apparmor profile %s"
@@ -104,7 +93,13 @@ class BaseProfile(object):
         else:
             status = "success"
 
-        return ExecutionResults(status, stdout, stderr, returncode, runtime)
+        return {
+            'status'        : status,
+            'stdout'        : stdout,
+            'stderr'        : stderr,
+            'returncode'    : returncode,
+            'runtime'       : runtime
+        }
 
     def _filename_gen(self): return base64.b64encode(os.urandom(42), "_-")
 
@@ -116,7 +111,8 @@ class CompilerProfile(BaseProfile):
 
     def __init__(self, config): BaseProfile.__init__(self, config)
 
-    def run(self, language, source, stdin, custom_timelimit=None):
+    def run(self, language, source, stdins, custom_timelimit=None):
+        stdins = [None] if stdins is None else stdins
         source_dir = os.path.join(self.config.DIRECTORIES['source'], self._filename_gen())
         source_file = os.path.join(source_dir, language.filename)
         compiler_file = os.path.join(self.config.DIRECTORIES["compiler"], self._filename_gen())
@@ -145,23 +141,25 @@ class CompilerProfile(BaseProfile):
                     completed))
 
             kill_thread.start()
-            returncode = None
-            try:
-                compile_out = proc.communicate()[0]
-            except Exception, e:
-                compile_out = str(e)
-                returncode = -9
+            compile_out, compile_err = proc.communicate()
             completed.append(True)
             kill_thread.join()
 
-            if returncode is None: returncode = proc.returncode
+            compilation_time = time.time() - compile_start_time
+            results = {
+                'compilation'       : {
+                    'command'           : ' '.join(command),
+                    'stdout'            : compile_out,
+                    'stderr'            : compile_err,
+                    'returncode'        : proc.returncode,
+                    'time'              : compilation_time
+                }
+            }
 
-            if returncode != 0:
-                if "killed" in completed:
-                    status = "compilation timeout"
-                else:
-                    status = "compilation failed"
-                return ExecutionResults(status, "", compile_out, returncode, 0.0)
+            if proc.returncode != 0:
+                results['status'] = 'compilation timeout' if 'killed' in completed else 'compilation failed'
+                results['runs'] = []
+                return results
 
             os.rename(compiler_file, executable_file)
 
@@ -170,9 +168,16 @@ class CompilerProfile(BaseProfile):
             else:
                 compiled_profile = self.config.APPARMOR_PROFILES["compiled"]
 
-            return self._run_user_program(["straitjacket-binary"], stdin,
-                    compiled_profile, time.time() - compile_start_time, executable_file,
-                    custom_timelimit=custom_timelimit)
+            run_results = [self._run_user_program(["straitjacket-binary"],
+                            stdin,
+                            compiled_profile,
+                            compilation_time,
+                            executable_file,
+                            custom_timelimit=custom_timelimit) for stdin in stdins]
+            results['runs'] = run_results
+            results['status'] = 'success'
+            return results
+
         finally:
             shutil.rmtree(source_dir)
             if os.path.exists(compiler_file): os.unlink(compiler_file)
@@ -185,7 +190,9 @@ class InterpreterProfile(BaseProfile):
 
     def __init__(self, config): BaseProfile.__init__(self, config)
 
-    def run(self, language, source, stdin, custom_timelimit=None):
+    def run(self, language, source, stdins, custom_timelimit=None):
+        stdins = [None] if stdins is None else stdins
+
         dirname = os.path.join(self.config.DIRECTORIES["source"], self._filename_gen())
         filename = os.path.join(dirname, language.filename)
         os.makedirs(dirname)
@@ -196,10 +203,10 @@ class InterpreterProfile(BaseProfile):
                 command = language.interpretation_command(filename)
             else:
                 command = [language.binary, filename]
-            return self._run_user_program(command,
-                         stdin,
-                         language.apparmor_profile,
-                         custom_timelimit=custom_timelimit)
+            return {
+                'status'    : 'success',
+                'runs'      : [self._run_user_program(command, stdin, language.apparmor_profile, custom_timelimit=custom_timelimit) for stdin in stdins]
+            }
 
         finally:
             shutil.rmtree(dirname)
@@ -212,7 +219,8 @@ class VMProfile(BaseProfile):
 
     def __init__(self, config): BaseProfile.__init__(self, config)
 
-    def run(self, language, source, stdin, custom_timelimit=None):
+    def run(self, language, source, stdins, custom_timelimit=None):
+        stdins = [None] if stdins is None else stdins
         source_dir = os.path.join(self.config.DIRECTORIES["source"],
                 self._filename_gen())
         source_file = os.path.join(source_dir, language.filename)
@@ -244,28 +252,36 @@ class VMProfile(BaseProfile):
                     completed))
 
             kill_thread.start()
-            returncode = None
-            try:
-                compile_out = proc.communicate()[0]
-            except Exception, e:
-                compile_out = str(e)
-                returncode = -9
+            compile_out, compile_err = proc.communicate()
             completed.append(True)
             kill_thread.join()
 
-            if returncode is None: returncode = proc.returncode
+            results = {
+                'compilation'       : {
+                    'command'           : ' '.join(command),
+                    'stdout'            : compile_out,
+                    'stderr'            : compile_err,
+                    'returncode'        : proc.returncode,
+                    'time'              : compilation_time
+                },
+                'runs'              : []
+            }
 
-            if returncode != 0:
-                if "killed" in completed:
-                    status = "compilation timeout"
-                else:
-                    status = "compilation failed"
-                return ExecutionResults(status, "", compile_out, returncode, 0.0)
+            if proc.returncode != 0:
+                results['status'] = 'compilation timeout' if 'killed' in completed else 'compilation failed'
+                return results
 
-            return self._run_user_program(language.vm_command(source_file),
-                    stdin, language.vm_apparmor_profile,
-                    time.time() - compile_start_time, chdir=source_dir,
-                    custom_timelimit=custom_timelimit)
+            run_results = [self._run_user_program(language.vm_command(source_file),
+                                stdin,
+                                language.vm_apparmor_profile,
+                                time.time() - compile_start_time,
+                                chdir=source_dir,
+                                custom_timelimit=custom_timelimit)
+                            for stdin in stdins]
+            results['status'] = 'success'
+            results['runs'] = run_results
+            return results
+
         finally:
             shutil.rmtree(source_dir)
 
