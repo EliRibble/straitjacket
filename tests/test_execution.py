@@ -98,10 +98,13 @@ def test_simple_stderr(webapp, do_json):
         'stdin'     : '',
     })
     assert response == {
-        'status'        : 'success',
-        'stdout'        : '',
-        'stderr'        : 'This is stderr',
-        'returncode'    : 0
+        'status'    : 'success',
+        'runs'      : [{
+            'status'        : 'success',
+            'stdout'        : '',
+            'stderr'        : 'This is stderr',
+            'returncode'    : 0
+        }]
     }
 
 def test_simple_stdin(webapp, do_json):
@@ -111,10 +114,13 @@ def test_simple_stdin(webapp, do_json):
         'stdin'     : 'some input',
     })
     assert response == {
-        'status'        : 'success',
-        'stdout'        : 'I read some input from stdin\n',
-        'stderr'        : '',
-        'returncode'    : 0
+        'status'    : 'success',
+        'runs'      : [{
+            'status'        : 'success',
+            'stdout'        : 'I read some input from stdin\n',
+            'stderr'        : '',
+            'returncode'    : 0
+        }]
     }
 
 def test_simple_returncode(webapp, do_json):
@@ -124,10 +130,13 @@ def test_simple_returncode(webapp, do_json):
         'stdin'     : '',
     })
     assert response == {
-        'status'        : 'success',
-        'stdout'        : '',
-        'stderr'        : '',
-        'returncode'    : 12 
+        'status'    : 'success',
+        'runs'      : [{
+            'status'        : 'success',
+            'stdout'        : '',
+            'stderr'        : '',
+            'returncode'    : 12 
+        }]
     }
 
 def test_compiler_error(webapp, do_json):
