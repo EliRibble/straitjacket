@@ -78,6 +78,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
                 data = web.input()
 
             timelimit = getattr(data, 'timelimit', None)
+            timelimit = float(timelimit) if timelimit else None
 
             try:
                 results = wrapper.run(data.language, data.source, data.stdin, custom_timelimit=timelimit)
