@@ -113,28 +113,12 @@ class StraitJacket(object):
         self.log_method("Failed to save cached language version data")
 
     if not skip_language_checks:
-      self.log_method("Initialized %d languages, %d enabled." % (
-          len(languages), len(self.languages)))
-
-  def _safe_language(self, config_file, lang_config, language):
-    return safe_language_check(config_file, language,
-        functools.partial( self._real_run, lang_config),
-        self.log_method)
-
-  def _get_exec_profile(self, profile_name):
-    if self.exec_profiles.has_key(profile_name):
-      return self.exec_profiles[profile_name]
-    if not hasattr(exec_profiles, profile_name):
-      raise ConfigError, "invalid execution profile"
-    profile_class = getattr(exec_profiles, profile_name)
-    if not issubclass(profile_class, exec_profiles.BaseProfile):
-      raise ConfigError, "invalid execution profile"
-    self.exec_profiles[profile_name] = profile_class(self.config)
-    return self.exec_profiles[profile_name]
+      self.log_method("Initialized %d languages" % (
+          len(self.languages)))
 
   def run(self, language, source, stdin, custom_timelimit=None):
-    if language not in self.languages:
-      raise InputError, "invalid language"
-    return self._real_run(self.languages[language], source, stdin,
-        custom_timelimit)
+    try:
+        return self.languages[language].execute(source, stdin, custom_timelimit)
+    except KeyError as k:
+        raise InputError, "invalid language"
 
