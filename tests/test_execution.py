@@ -42,10 +42,13 @@ def test_too_long_execution_default(webapp, do_json):
         'stdin'     : ''
     })
     response == {
-        'status'        : 'timeout',
-        'stdout'        : '',
-        'stderr'        : '',
-        'returncode'    : None,
+        'status'    : 'success',
+        'runs'      : [{
+            'status'        : 'timeout',
+            'stdout'        : '',
+            'stderr'        : '',
+            'returncode'    : None,
+        }]
     }
 
 def test_too_long_execution_custom(webapp, do_json):
@@ -56,10 +59,13 @@ def test_too_long_execution_custom(webapp, do_json):
         'timelimit' : 2
     })
     response == {
-        'status'        : 'timeout',
-        'stdout'        : '',
-        'stderr'        : '',
-        'returncode'    : None,
+        'status'    : 'success',
+        'runs'      : [{
+            'status'        : 'timeout',
+            'stdout'        : '',
+            'stderr'        : '',
+            'returncode'    : None,
+        }]
     }
 
 def test_null_execution(webapp, do_json):
