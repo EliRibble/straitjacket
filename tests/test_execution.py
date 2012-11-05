@@ -94,3 +94,14 @@ def test_simple_returncode(webapp):
     assert response['returncode'] == 12
     assert response['error'] == 'runtime_error'
 
+def test_compiler_error(webapp):
+    response = _execute_and_parse(webapp, {
+        'language'  : 'C',
+        'source'    : 'invalid',
+        'stdin'     : '',
+    })
+    assert response['stdout'] == ''
+    assert response['returncode'] == 1
+    assert response['time'] == 0.0
+    assert response['error'] == 'compilation_error'
+    
