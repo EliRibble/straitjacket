@@ -32,7 +32,7 @@ class Language(object):
         self.options                    = options if options else []
         self.visible_name               = visible_name if visible_name else '{0} ({1})'.format(name, binary + ' '.join(self.options))
         self.version_switch             = version_switch if version_switch else "--version"
-        self.version                    = version if version else self.get_version()
+        self._version                   = version
         self.interpretation_command     = interpretation_command
         self.vm_command                 = vm_command
         self.compiler_apparmor_profile  = compiler_apparmor_profile
@@ -40,6 +40,12 @@ class Language(object):
         self.vm_apparmor_profile        = vm_apparmor_profile
         self.compilation_command        = compilation_command
         self.tests                      = []
+
+    @property
+    def version(self):
+        if self._version is None:
+            self._version = self.get_version()
+        return self._version
 
     def get_version(self):
         proc = subprocess.Popen([self.binary, self.version_switch], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
