@@ -25,6 +25,8 @@ import exec_profiles
 import subprocess
 import functools
 
+import languages
+
 class Error_(Exception): pass
 class InputError(Error_): pass
 class ConfigError(Error_): pass
@@ -82,10 +84,6 @@ class StraitJacket(object):
     f.close()
     return parsed
 
-  def _get_all_languages(self):
-    from lib import languages
-    return languages.all()
-
   def __init__(self, config_dir, log_method=None, skip_language_checks=False):
     self.log_method = log_method or stderr_log
     self.config_dir = config_dir
@@ -104,20 +102,7 @@ class StraitJacket(object):
     
     self.exec_profiles = {}
 
-    languages = self._get_all_languages()
-
-    if skip_language_checks:
-        self.languages = {language.name: language for language in languages}
-
-    self.languages = {}
-    for language in languages:
-        if not language.is_enabled():
-            continue
-        for test in language.tests:
-            if not test.passes():
-                continue
-        self.languages[language.name] = language
-
+    self.languages = {language.name: language for language in languages.all()}
 
     if self.cached_versions_needs_flush:
       try:
