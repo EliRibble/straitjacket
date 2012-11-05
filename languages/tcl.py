@@ -2,7 +2,11 @@ from languages.base import Language, LanguageTest
 from lib import exec_profiles
 import straitjacket_settings
 
-tcl = Language('Tcl',
+class TclLanguage(Language):
+    def get_version(self):
+        return self.execute( "puts $tcl_version", None, None ).stdout.rstrip()
+
+tcl = TclLanguage('Tcl',
     profile             = exec_profiles.InterpreterProfile(straitjacket_settings),
     binary              = 'tclsh',
     filename            = 'source.tcl',
