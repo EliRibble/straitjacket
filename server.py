@@ -79,6 +79,8 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
                 })
             except straitjacket.InputError:
                 raise web.badrequest()
+            except AttributeError:
+                raise web.badrequest()
 
     class info:
         def GET(self):
