@@ -154,7 +154,7 @@ def test_multiple_runs(webapp):
             'returncode'    : 0
         },{
             'status'        : 'success',
-            'stdout'        : 'Read test one from stdin',
+            'stdout'        : 'Read test two from stdin',
             'stderr'        : '',
             'returncode'    : 0
         }]
