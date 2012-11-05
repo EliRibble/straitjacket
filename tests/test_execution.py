@@ -131,10 +131,30 @@ def test_compiler_error(webapp, do_json):
         'source'    : 'invalid',
         'stdin'     : '',
     })
-    del response['stderr']
+    assert response['status'] == 'compilation failed'
+    assert 'gcc' in response['compilation']['command']
+    assert response['compilation']['stderr'] is None
+    assert 'time' in response['compilation']
+    assert 'stdout' in response['compilation']
+
+def test_multiple_runs(webapp):
+    response = _execute_and_parse(webapp, True, {
+        'language'  : 'Python',
+        'source'    : 'import sys;sys.stdout.write("Read " + sys.stdin.read() + " from stdin")',
+        'stdin'     : ['test one', 'test two'],
+    })
     assert response == {
-        'status'        : 'compilation failed',
-        'stdout'        : '',
-        'returncode'    : 1 
+        'status'        : 'success',
+        'runs'          : [{
+            'status'        : 'success',
+            'stdout'        : 'Read test one from stdin',
+            'stderr'        : '',
+            'returncode'    : 0
+        },{
+            'status'        : 'success',
+            'stdout'        : 'Read test one from stdin',
+            'stderr'        : '',
+            'returncode'    : 0
+        }]
     }
-    
+
