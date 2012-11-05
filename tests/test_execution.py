@@ -10,10 +10,12 @@ def _execute(webapp, do_json, params) :
 def _execute_and_parse(webapp, do_json, params):
     response = _execute(webapp, do_json, params)
     assert response.status == '200 OK'
+    data = json.loads(response['data'])
     # We have no way of testing the time since it is
     # highly dependent of the system it is run on
     # so we just make sure that it is present and a float
-    data = json.loads(response['data'])
+    for run in data['runs']:
+        del run['runtime']
     return data
 
 def test_bad_language(webapp, do_json):
