@@ -14,8 +14,6 @@ def _execute_and_parse(webapp, do_json, params):
     # highly dependent of the system it is run on
     # so we just make sure that it is present and a float
     data = json.loads(response['data'])
-    assert float(data['time']) >= 0.0
-    del data['time']
     return data
 
 def test_bad_language(webapp, do_json):
