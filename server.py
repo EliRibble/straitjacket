@@ -56,14 +56,18 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
     if not wrapper:
         wrapper = straitjacket.StraitJacket(config_dir, skip_language_checks=skip_language_checks)
 
-    index_html = INDEX_HTML % {"languages": "\n".join(
-            ('<option value="%s">%s - %s</option>' % (lang,
-             wrapper.languages[lang].visible_name,
-             wrapper.languages[lang].version)
-             for lang in sorted(wrapper.languages.keys())))}
 
     class index:
+        def __init__(self):
+            self.index_html = None
+
         def GET(self):
+            if not self.index_html:
+                self.index_html = INDEX_HTML % {"languages": "\n".join(
+                        ('<option value="%s">%s - %s</option>' % (lang,
+                         wrapper.languages[lang].visible_name,
+                         wrapper.languages[lang].version)
+             for lang in sorted(wrapper.languages.keys())))}
             web.header('Content-Type', 'text/html')
             return index_html
 
