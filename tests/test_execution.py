@@ -16,6 +16,16 @@ def test_bad_language(webapp):
         'stdin'     : ''})
     assert response.status == '400 Bad Request'
 
+def test_missing_required_parameters(webapp):
+    for param in ('language', 'source'):
+        good_request = {
+            'language'  : 'Python',
+            'source'    : 'print("hi")',
+        }
+        del good_request[param]
+        response = _execute(webapp, good_request)
+        assert response.status == '400 Bad Request'
+
 def test_too_long_execution_default(webapp):
     response = _execute_and_parse(webapp, {
         'language'  : 'Ruby 1.8',
