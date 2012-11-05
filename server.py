@@ -68,10 +68,14 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
         try: timelimit = float(f.timelimit)
         except: pass
       try:
-        stdout, stderr, exitstatus, runtime, error = wrapper.run(f.language,
-            f.source, f.stdin, custom_timelimit=timelimit)
-        return json.dumps({"stdout": stdout, "stderr": stderr,
-            "exitstatus": exitstatus, "time": runtime, "error": error})
+        results = wrapper.run(f.language, f.source, f.stdin, custom_timelimit=timelimit)
+        return json.dumps({
+            "stdout"        : results.stdout,
+            "stderr"        : results.stderr,
+            "returncode"    : results.returncode,
+            "time"          : results.runtime,
+            "error"         : results.error
+        })
       except straitjacket.InputError: raise web.badrequest()
 
   class info:
