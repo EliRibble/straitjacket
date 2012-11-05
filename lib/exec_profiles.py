@@ -256,6 +256,7 @@ class VMProfile(BaseProfile):
             completed.append(True)
             kill_thread.join()
 
+            compilation_time = time.time() - compile_start_time
             results = {
                 'compilation'       : {
                     'command'           : ' '.join(command),
@@ -274,7 +275,7 @@ class VMProfile(BaseProfile):
             run_results = [self._run_user_program(language.vm_command(source_file),
                                 stdin,
                                 language.vm_apparmor_profile,
-                                time.time() - compile_start_time,
+                                compilation_time,
                                 chdir=source_dir,
                                 custom_timelimit=custom_timelimit)
                             for stdin in stdins]
