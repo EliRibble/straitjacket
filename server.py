@@ -28,7 +28,7 @@ __license__ = "AGPLv3"
 __email__ = "jt@instructure.com"
 
 DEFAULT_CONFIG_DIR = os.path.join(os.path.realpath(os.path.dirname(__file__)),
-    "config")
+        "config")
 
 INDEX_HTML = """
 <h1>welcome to straitjacket</h1>
@@ -44,58 +44,60 @@ INDEX_HTML = """
 """
 
 def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=False):
-  if not wrapper:
-    wrapper = straitjacket.StraitJacket(config_dir,
-        skip_language_checks=skip_language_checks)
+    if not wrapper:
+        wrapper = straitjacket.StraitJacket(config_dir, skip_language_checks=skip_language_checks)
 
-  index_html = INDEX_HTML % {"languages": "\n".join(
-      ('<option value="%s">%s - %s</option>' % (lang,
-       wrapper.languages[lang].visible_name,
-       wrapper.languages[lang].version)
-       for lang in sorted(wrapper.languages.keys())))}
+    index_html = INDEX_HTML % {"languages": "\n".join(
+            ('<option value="%s">%s - %s</option>' % (lang,
+             wrapper.languages[lang].visible_name,
+             wrapper.languages[lang].version)
+             for lang in sorted(wrapper.languages.keys())))}
 
-  class index:
-    def GET(self):
-      web.header('Content-Type', 'text/html')
-      return index_html
+    class index:
+        def GET(self):
+            web.header('Content-Type', 'text/html')
+            return index_html
 
-  class execute:
-    def POST(self):
-      web.header('Content-Type', 'text/plain')
-      f = web.input()
-      timelimit = None
-      if f.has_key("timelimit") and len(f.timelimit) > 0:
-        try: timelimit = float(f.timelimit)
-        except: pass
-      try:
-        results = wrapper.run(f.language, f.source, f.stdin, custom_timelimit=timelimit)
-        return json.dumps({
-            "stdout"        : results.stdout,
-            "stderr"        : results.stderr,
-            "returncode"    : results.returncode,
-            "time"          : results.runtime,
-            "error"         : results.error
-        })
-      except straitjacket.InputError: raise web.badrequest()
+    class execute:
+        def POST(self):
+            web.header('Content-Type', 'text/plain')
+            f = web.input()
+            timelimit = None
+            if f.has_key("timelimit") and len(f.timelimit) > 0:
+                try:
+                    timelimit = float(f.timelimit)
+                except:
+                    pass
+            try:
+                results = wrapper.run(f.language, f.source, f.stdin, custom_timelimit=timelimit)
+                return json.dumps({
+                        "stdout"                : results.stdout,
+                        "stderr"                : results.stderr,
+                        "returncode"        : results.returncode,
+                        "time"                    : results.runtime,
+                        "error"                 : results.error
+                })
+            except straitjacket.InputError:
+                raise web.badrequest()
 
-  class info:
-    def GET(self):
-      web.header('Content-Type', 'text/json')
-      languages = {}
-      for lang in wrapper.enabled_languages:
-        languages[lang] = {
-            "visible_name": wrapper.enabled_languages[lang]["visible_name"],
-            "version": wrapper.enabled_languages[lang]["version"]}
-      return json.dumps({"languages": languages})
+    class info:
+        def GET(self):
+            web.header('Content-Type', 'text/json')
+            languages = {}
+            for lang in wrapper.enabled_languages:
+                languages[lang] = {
+                        "visible_name": wrapper.enabled_languages[lang]["visible_name"],
+                        "version": wrapper.enabled_languages[lang]["version"]}
+            return json.dumps({"languages": languages})
 
-  app = web.application((
-      '/', 'index',
-      '/execute', 'execute',
-      '/info', 'info',
-    ), locals())
+    app = web.application((
+            '/', 'index',
+            '/execute', 'execute',
+            '/info', 'info',
+        ), locals())
 
-  return app
+    return app
 
 if __name__ == "__main__":
-    webapp().run()
+        webapp().run()
 application = webapp().wsgifunc()
