@@ -148,9 +148,9 @@ class CompilerProfile(BaseProfile):
             compilation_time = time.time() - compile_start_time
             results = {
                 'compilation'       : {
-                    'command'           : ' '.join(command),
-                    'stdout'            : compile_out if compile_out else '',
-                    'stderr'            : compile_err if compile_err else '',
+                    'command'           : ' '.join(command).replace(compiler_file, '<output>').replace(source_file, '<source>'),
+                    'stdout'            : compile_out.replace(source_file, '<source>') if compile_out else '',
+                    'stderr'            : compile_err.replace(source_file, '<source>') if compile_err else '',
                     'returncode'        : proc.returncode,
                     'time'              : compilation_time
                 }
@@ -259,9 +259,9 @@ class VMProfile(BaseProfile):
             compilation_time = time.time() - compile_start_time
             results = {
                 'compilation'       : {
-                    'command'           : ' '.join(command),
-                    'stdout'            : compile_out if compile_out else '',
-                    'stderr'            : compile_err if compile_err else '',
+                    'command'           : ' '.join(command).replace(source_file, '<source>'),
+                    'stdout'            : compile_out.replace(source_file, '<source>') if compile_out else '',
+                    'stderr'            : compile_err.replace(source_file, '<source>') if compile_err else '',
                     'returncode'        : proc.returncode,
                     'time'              : compilation_time
                 },
