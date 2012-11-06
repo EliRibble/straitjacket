@@ -57,7 +57,7 @@ class BaseProfile(object):
             os.kill(pid, 9)
             completed.append("killed")
 
-    def _run_user_program(self, user_program, stdin, aa_profile, time_used=0, executable=None, chdir=None, custom_timelimit=None):
+    def _run_user_program(self, user_program, stdin, aa_profile, time_used=0, executable=None, chdir=None, custom_timelimit=None, source_file=None):
         if custom_timelimit == None:
             custom_timelimit = float('inf')
         completed = []
@@ -96,8 +96,8 @@ class BaseProfile(object):
 
         return {
             'status'        : status,
-            'stdout'        : stdout,
-            'stderr'        : stderr,
+            'stdout'        : stdout.replace(source_file, "<source>") if source_file else stdout,
+            'stderr'        : stderr.replace(source_file, "<source>") if source_file else stderr,
             'returncode'    : returncode,
             'runtime'       : runtime
         }
@@ -206,7 +206,11 @@ class InterpreterProfile(BaseProfile):
                 command = [language.binary, filename]
             return {
                 'status'    : 'success',
-                'runs'      : [self._run_user_program(command, stdin, language.apparmor_profile, custom_timelimit=custom_timelimit) for stdin in stdins]
+                'runs'      : [self._run_user_program(command,
+                                stdin,
+                                language.apparmor_profile,
+                                custom_timelimit=custom_timelimit,
+                                source_file=filename) for stdin in stdins]
             }
 
         finally:
@@ -278,7 +282,8 @@ class VMProfile(BaseProfile):
                                 language.vm_apparmor_profile,
                                 compilation_time,
                                 chdir=source_dir,
-                                custom_timelimit=custom_timelimit)
+                                custom_timelimit=custom_timelimit,
+                                source_file=source_file)
                             for stdin in stdins]
             results['status'] = 'success'
             results['runs'] = run_results
