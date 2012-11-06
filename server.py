@@ -69,7 +69,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
                          wrapper.languages[lang].version)
              for lang in sorted(wrapper.languages.keys())))}
             web.header('Content-Type', 'text/html')
-            return index_html
+            return self.index_html
 
     class execute:
         def POST(self):
