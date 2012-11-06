@@ -90,6 +90,7 @@ class BaseProfile(object):
 
         if "killed" in completed or runtime > custom_timelimit:
             status = "timeout"
+            returncode = None
         else:
             status = "success"
 
