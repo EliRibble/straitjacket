@@ -18,6 +18,10 @@ def _execute_and_parse(webapp, do_json, params):
         del run['runtime']
     return data
 
+def test_get_language_info(webapp):
+    response = webapp.request('/info', 'GET')
+    assert response.status == '200 OK'
+
 def test_bad_language(webapp, do_json):
     response = _execute(webapp, do_json, {
         'language'  : 'non-existent-language',

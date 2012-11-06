@@ -97,12 +97,11 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
     class info:
         def GET(self):
             web.header('Content-Type', 'text/json')
-            languages = {}
-            for lang in wrapper.enabled_languages:
-                languages[lang] = {
-                        "visible_name": wrapper.enabled_languages[lang]["visible_name"],
-                        "version": wrapper.enabled_languages[lang]["version"]}
-            return json.dumps({"languages": languages})
+            return json.dumps({'languages': [{
+                'name'          : language.name,
+                'visible_name'  : language.visible_name,
+                'version'       : language.version
+            } for language in wrapper.languages.values()]})
 
     app = web.application((
             '/', 'index',
