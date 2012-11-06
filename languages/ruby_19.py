@@ -3,7 +3,7 @@ from lib import exec_profiles
 import straitjacket_settings
 
 ruby_19 = Language('Ruby 1.9',
-    visible_name        = 'Ruby (ruby1.9)',
+    visible_name        = 'Ruby 1.9 (ruby1.9)',
     profile             = exec_profiles.InterpreterProfile(straitjacket_settings),
     binary              = 'ruby1.9.1',
     filename            = 'source.rb',
