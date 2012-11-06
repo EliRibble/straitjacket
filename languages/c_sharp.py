@@ -4,7 +4,7 @@ import straitjacket_settings
 
 c_sharp = Language('C#',
     profile                     = exec_profiles.VMProfile(straitjacket_settings),
-    binary                      = '/usr/bin/gmcs',
+    binary                      = 'gmcs',
     filename                    = 'source.cs',
     version_switch              = '--version',
     compilation_command         = lambda source: ["mono", "/usr/lib/mono/2.0/gmcs.exe", "-out:main.exe", source],
