@@ -14,22 +14,19 @@ LanguageTest('test-simple', ruby_19,
                   ),
     stdout      = 'hi from ruby\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', ruby_19,
     source      = ( 'puts File.read("/etc/hosts")                                \n'
                   ),
     stdout      = '',
     stderr      = 'Permission denied - /etc/hosts \(Errno::EACCES\)',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 
 LanguageTest('test-rlimit', ruby_19,
     source      = ( 'x = [0] * 1073741824                                        \n'
                   ),
     stdout      = '',
     stderr      = 'failed to allocate memory \(NoMemoryError\)',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 

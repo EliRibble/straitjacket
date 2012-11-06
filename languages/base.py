@@ -64,14 +64,17 @@ class Language(object):
     def execute(self, source, stdin, timelimit=None):
         return self.profile.run(self, source, stdin, custom_timelimit=timelimit)
 
+    def __repr__(self):
+        return "Language {0}".format(self.name)
+
 class LanguageTest(object):
-    def __init__(self, name, language, source, stdout='', stderr='', returncode=0, error=None):
+    def __init__(self, name, language, source, stdout='', stderr='', returncode=0, status='success'):
         self.name           = name
         self.language       = language
         self.source         = source
         self.stdin          = None
         self.returncode     = returncode
-        self.error          = error
+        self.status         = status
         self.stdout_pattern = stdout
         self.stderr_pattern = stderr
 
@@ -86,8 +89,17 @@ class LanguageTest(object):
 
     def test(self):
         result = self.language.execute( self.source, self.stdin, None )
-        assert self.returncode == result.returncode
-        assert self.error      == result.error
-        assert re.search(self.stdout_pattern, result.stdout)
-        assert re.search(self.stderr_pattern, result.stderr)
+        assert result['status'] == self.status
+        if self.status == 'success':
+            assert result['runs'][0]['returncode'] == self.returncode
+            assert re.search( self.stdout_pattern, result['runs'][0]['stdout'] )
+            assert re.search( self.stderr_pattern, result['runs'][0]['stderr'] )
+        else:
+            assert result['compilation']['returncode'] == self.returncode
+            assert re.search( self.stdout_pattern, result['compilation']['stdout'] )
+            assert re.search( self.stderr_pattern, result['compilation']['stderr'] )
+
+    def __repr__(self):
+        return "LanguageTest {0} for {1}".format(self.name, self.language)
+            
 

@@ -50,6 +50,6 @@ LanguageTest('test-argv0', cpp,
 LanguageTest('test-includesafe', cpp,
     source      = ( '#include "/etc/hosts"                          \n'
                     'int main(int argc, char** argv) { return 0; }' ),
-    stderr      = 'fatal error: /etc/hosts: Permission denied',
+    stdout      = 'fatal error: /etc/hosts: Permission denied',
     returncode  = 1,
-    error       = 'compilation_error')
+    status      = 'compilation failed')

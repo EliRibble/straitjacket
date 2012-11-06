@@ -14,8 +14,7 @@ LanguageTest('test-simple', javascript,
                   ),
     stdout      = 'hello js\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', javascript,
     source      = ( 'var fs = require("fs");                                     \n'
@@ -26,8 +25,7 @@ LanguageTest('test-apparmor', javascript,
                   ),
     stdout      = '',
     stderr      = "Error: EACCES, open '/etc/hosts'",
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 
 LanguageTest('test-rlimit', javascript,
     source      = ( 'var buffer1 = new Buffer(536870912);                        \n'
@@ -37,6 +35,5 @@ LanguageTest('test-rlimit', javascript,
                   ),
     stdout      = '',
     stderr      = "terminate called after throwing an instance of 'std::bad_alloc'",
-    returncode  = -6,
-    error       = 'runtime_error')
+    returncode  = -6)
 

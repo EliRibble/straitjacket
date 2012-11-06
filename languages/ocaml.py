@@ -14,8 +14,7 @@ LanguageTest('test-simple', ocaml,
                   ),
     stdout      = 'Hello from OCaml!\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', ocaml,
     source      = ( 'let lines = ref [] in                                       \n'
@@ -30,8 +29,7 @@ LanguageTest('test-apparmor', ocaml,
                   ),
     stdout      = '',
     stderr      = 'Fatal error: exception Sys_error\("/etc/hosts: Permission denied"\)\n',
-    returncode  = 2,
-    error       = 'runtime_error')
+    returncode  = 2)
 
 LanguageTest('test-rlimit', ocaml,
     source      = ( 'let rec build_list = fun (array, x) ->                      \n'
@@ -44,6 +42,5 @@ LanguageTest('test-rlimit', ocaml,
                   ),
     stdout      = '',
     stderr      = 'Fatal error: out of memory.\n',
-    returncode  = 2,
-    error       = 'runtime_error')
+    returncode  = 2)
 

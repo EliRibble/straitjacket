@@ -21,8 +21,7 @@ LanguageTest('test-simple', go,
                   ),
     stdout      = 'Hello from Go',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-rlimit', go,
     source      = ( 'package main                                                \n'
@@ -33,8 +32,7 @@ LanguageTest('test-rlimit', go,
                   ),
     stdout      = '',
     stderr      = 'out of memory',
-    returncode  = 2,
-    error       = 'runtime_error')
+    returncode  = 2)
 
 LanguageTest('test-apparmor', go,
     source      = ( 'package main                                                \n'
@@ -59,6 +57,5 @@ LanguageTest('test-apparmor', go,
                   ),
     stdout      = 'error: open /etc/hosts: permission denied',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 

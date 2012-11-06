@@ -20,8 +20,7 @@ LanguageTest('test-simple', scala,
                   ),
     stdout      = 'Hello from Scala\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', scala,
     source      = ( 'import scala.io._                                           \n'
@@ -36,8 +35,7 @@ LanguageTest('test-apparmor', scala,
                   ),
     stdout      = '',
     stderr      = 'java.io.FileNotFoundException: /etc/hosts \(Permission denied\)',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-rlimit', scala,
     source      = ( 'object Main {                                               \n'
@@ -49,8 +47,7 @@ LanguageTest('test-rlimit', scala,
                   ),
     stdout      = '',
     stderr      = 'java.lang.OutOfMemoryError: Java heap space\n',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-application-trait', scala,
     source      = ( 'object Main extends Application {                           \n'
@@ -59,6 +56,5 @@ LanguageTest('test-application-trait', scala,
                   ),
     stdout      = 'hello from scala\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 

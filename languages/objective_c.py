@@ -18,8 +18,7 @@ LanguageTest('test-simple', objective_c,
                     '}'),
     stdout      = 'obj-c compilation succeeded',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-rlimit', objective_c,
     source      = ( '#include <stdio.h>                         \n'
@@ -29,8 +28,7 @@ LanguageTest('test-rlimit', objective_c,
                     '}'),
     stdout      = 'forked: -1',
     stderr      = '',
-    returncode  = 3,
-    error       = 'runtime_error')
+    returncode  = 3)
 
 
 LanguageTest('test-apparmor', objective_c,
@@ -46,8 +44,7 @@ LanguageTest('test-apparmor', objective_c,
                     '}'),
     stdout      = 'not opened: 13',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-argv0', objective_c,
     source      = ( '#include <stdio.h>                 \n'
@@ -57,13 +54,11 @@ LanguageTest('test-argv0', objective_c,
                     '}'),
     stdout      = 'straitjacket-binary',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-includesafe', objective_c,
     source      = ( '#include "/etc/hosts"                          \n'
                     'int main(int argc, char** argv) { return 0; }'),
-    stdout      = '',
-    stderr      = 'fatal error: /etc/hosts: Permission denied\n',
+    stdout      = 'fatal error: /etc/hosts: Permission denied\n',
     returncode  = 1,
-    error       = 'compilation_error')
+    status      = 'compilation failed')

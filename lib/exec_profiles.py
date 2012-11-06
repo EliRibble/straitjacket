@@ -149,8 +149,8 @@ class CompilerProfile(BaseProfile):
             results = {
                 'compilation'       : {
                     'command'           : ' '.join(command),
-                    'stdout'            : compile_out,
-                    'stderr'            : compile_err,
+                    'stdout'            : compile_out if compile_out else '',
+                    'stderr'            : compile_err if compile_err else '',
                     'returncode'        : proc.returncode,
                     'time'              : compilation_time
                 }
@@ -260,8 +260,8 @@ class VMProfile(BaseProfile):
             results = {
                 'compilation'       : {
                     'command'           : ' '.join(command),
-                    'stdout'            : compile_out,
-                    'stderr'            : compile_err,
+                    'stdout'            : compile_out if compile_out else '',
+                    'stderr'            : compile_err if compile_err else '',
                     'returncode'        : proc.returncode,
                     'time'              : compilation_time
                 },

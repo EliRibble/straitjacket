@@ -19,8 +19,7 @@ LanguageTest('test-simple', d,
                   ),
     stdout      = 'Hello from D\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', d,
     source      = ( 'import std.stdio;                                           \n'
@@ -32,8 +31,7 @@ LanguageTest('test-apparmor', d,
                   ),
     stdout      = '',
     stderr      = '/etc/hosts: Permission denied',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 
 LanguageTest('test-rlimit', d,
     source      = ( 'import std.stdio;                                           \n'
@@ -44,6 +42,5 @@ LanguageTest('test-rlimit', d,
                   ),
     stdout      = '',
     stderr      = 'core.exception.OutOfMemoryError',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 

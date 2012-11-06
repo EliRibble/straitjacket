@@ -13,8 +13,7 @@ LanguageTest('test-simple', haskell,
                   ),
     stdout      = 'hello from haskell\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', haskell,
     source      = ( 'main = do                                                   \n'
@@ -23,8 +22,7 @@ LanguageTest('test-apparmor', haskell,
                   ),
     stdout      = '',
     stderr      = '/etc/hosts: openFile: permission denied \(Permission denied\)',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 
 LanguageTest('test-rlimit', haskell,
     source      = ( 'import Control.Monad                                        \n'
@@ -34,6 +32,5 @@ LanguageTest('test-rlimit', haskell,
                   ),
     stdout      = '',
     stderr      = 'forkProcess: resource exhausted \(Resource temporarily unavailable\)',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 

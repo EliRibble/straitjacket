@@ -21,8 +21,7 @@ LanguageTest('test-simple', java,
                   ),
     stdout      = 'Hello from Java\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', java,
     source      = ( 'import java.io.*;                                           \n'
@@ -45,8 +44,7 @@ LanguageTest('test-apparmor', java,
                   ),
     stdout      = '',
     stderr      = 'SJ Error: /etc/hosts \(Permission denied\)\n',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-rlimit', java,
     source      = ( 'public class Main {                                         \n'
@@ -57,6 +55,5 @@ LanguageTest('test-rlimit', java,
                   ),
     stdout      = '',
     stderr      = 'Exception in thread "main" java.lang.OutOfMemoryError',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 

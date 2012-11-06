@@ -20,8 +20,7 @@ LanguageTest('test-simple', c_sharp,
                     '}'),
     stdout      = r'hey c# world, sup\?\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-rlimit', c_sharp,
     source      = ( 'public class TestRLimit {                  \n'
@@ -31,8 +30,7 @@ LanguageTest('test-rlimit', c_sharp,
                     '}'),
     stdout      = '',
     stderr      = 'System.OutOfMemoryException: Out of memory',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 
 LanguageTest('test-apparmor', c_sharp,
     source      = ( 'using System; using System.IO;             \n'
@@ -45,6 +43,5 @@ LanguageTest('test-apparmor', c_sharp,
                     '}'),
     stdout      = '',
     stderr      = 'Access to the path "/etc/passwd" is denied.',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 

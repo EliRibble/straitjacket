@@ -14,5 +14,4 @@ LanguageTest('test-simple', clojure,
     source      = '(println "Hello from Clojure")',
     stdout      = 'Hello from Clojure',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)

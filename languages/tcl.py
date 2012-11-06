@@ -19,28 +19,15 @@ LanguageTest('test-simple', tcl,
     source      = 'puts "hello from tcl"',
     stdout      = 'hello from tcl',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', tcl,
-    source      = ( 'open FILE, "/etc/hosts" or die $!;                          \n'
-                    'while (<FILE>) {                                            \n'
-                    'print $_;                                                   \n'
-                    '}                                                           \n'
+    source      = ( 'set fp [open "/etc/hosts" r]                                \n'
+                    'set file_data [read $fp]                                    \n'
+                    'close $fp;                                                  \n'
+                    'puts $file_data;                                            \n'
                   ),
     stdout      = '',
-    stderr      = 'Permission denied at',
-    returncode  = 13,
-    error       = 'runtime_error')
-
-LanguageTest('test-rlimit', tcl,
-    source      = ( 'my $pid = fork();                                           \n'
-                    'if(defined $pid) { print "defined"; }                       \n'
-                    'else { print "undefined"; }                                 \n'
-                    'print $pid;                                                 \n'
-                  ),
-    stdout      = 'undefined',
-    stderr      = '',
-    returncode  = 0,
-    error       = None)
+    stderr      = 'permission denied',
+    returncode  = 1)
 

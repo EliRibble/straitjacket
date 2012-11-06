@@ -16,8 +16,7 @@ LanguageTest('test-simple', scheme,
                   ),
     stdout      = 'hi from scheme\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', scheme,
     source      = ( '(with-input-from-file "/etc/passwd" (lambda ()              \n'
@@ -28,14 +27,12 @@ LanguageTest('test-apparmor', scheme,
                   ),
     stdout      = '',
     stderr      = 'with-input-from-file: cannot open input file: "/etc/passwd" \(Permission denied; errno=13\)\n',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 
 LanguageTest('test-rlimit', scheme,
     source      = ( '(begin (display (make-string 1073741824)) (newline))        \n'
                   ),
     stdout      = '',
     stderr      = 'out of memory',
-    returncode  = -6,
-    error       = 'runtime_error')
+    returncode  = -6)
 
