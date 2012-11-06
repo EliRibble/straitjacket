@@ -56,7 +56,7 @@ class Language(object):
             m = re.search(self.version_pattern, stdout)
             if m:
                 return m.group('version')
-        return stdout.split('\n')[0]
+        return stdout.split('\n')[0].strip()
 
     def is_enabled(self):
         return self.enabled
