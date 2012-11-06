@@ -13,22 +13,19 @@ LanguageTest('test-simple', ruby_18,
                   ),
     stdout      = 'hi from ruby\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', ruby_18,
     source      = ( 'puts File.read("/etc/hosts")                                \n'
                   ),
     stdout      = '',
     stderr      = 'Permission denied - /etc/hosts \(Errno::EACCES\)',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 
 LanguageTest('test-rlimit', ruby_18,
     source      = ( 'puts fork                                                   \n'
                   ),
     stdout      = '',
     stderr      = "in `fork': Resource temporarily unavailable - fork\(2\) \(Errno::EAGAIN\)",
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 

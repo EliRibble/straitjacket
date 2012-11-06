@@ -20,15 +20,14 @@
 import web
 import json
 import os
+import logging
+
 from lib import straitjacket
 
-__author__ = "JT Olds"
-__copyright__ = "Copyright 2011 Instructure, Inc."
-__license__ = "AGPLv3"
-__email__ = "jt@instructure.com"
+LOGGER = logging.getLogger('server')
 
 DEFAULT_CONFIG_DIR = os.path.join(os.path.realpath(os.path.dirname(__file__)),
-    "config")
+        "config")
 
 INDEX_HTML = """
 <h1>welcome to straitjacket</h1>
@@ -43,59 +42,76 @@ INDEX_HTML = """
 </form>
 """
 
+class JSONWrapper(object):
+    def __init__(self, json):
+        self.json = json
+
+    def __getattr__(self, name):
+        try:
+            return self.json[name]
+        except KeyError:
+            raise AttributeError
+
 def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=False):
-  if not wrapper:
-    wrapper = straitjacket.StraitJacket(config_dir,
-        skip_language_checks=skip_language_checks)
+    if not wrapper:
+        wrapper = straitjacket.StraitJacket(config_dir, skip_language_checks=skip_language_checks)
 
-  index_html = INDEX_HTML % {"languages": "\n".join(
-      ('<option value="%s">%s - %s</option>' % (lang,
-       wrapper.languages[lang].visible_name,
-       wrapper.languages[lang].version)
-       for lang in sorted(wrapper.languages.keys())))}
 
-  class index:
-    def GET(self):
-      web.header('Content-Type', 'text/html')
-      return index_html
+    class index:
+        def __init__(self):
+            self.index_html = None
 
-  class execute:
-    def POST(self):
-      web.header('Content-Type', 'text/plain')
-      f = web.input()
-      timelimit = None
-      if f.has_key("timelimit") and len(f.timelimit) > 0:
-        try: timelimit = float(f.timelimit)
-        except: pass
-      try:
-        results = wrapper.run(f.language, f.source, f.stdin, custom_timelimit=timelimit)
-        return json.dumps({
-            "stdout"        : results.stdout,
-            "stderr"        : results.stderr,
-            "returncode"    : results.returncode,
-            "time"          : results.runtime,
-            "error"         : results.error
-        })
-      except straitjacket.InputError: raise web.badrequest()
+        def GET(self):
+            if not self.index_html:
+                self.index_html = INDEX_HTML % {"languages": "\n".join(
+                        ('<option value="%s">%s - %s</option>' % (lang,
+                         wrapper.languages[lang].visible_name,
+                         wrapper.languages[lang].version)
+             for lang in sorted(wrapper.languages.keys())))}
+            web.header('Content-Type', 'text/html')
+            return index_html
 
-  class info:
-    def GET(self):
-      web.header('Content-Type', 'text/json')
-      languages = {}
-      for lang in wrapper.enabled_languages:
-        languages[lang] = {
-            "visible_name": wrapper.enabled_languages[lang]["visible_name"],
-            "version": wrapper.enabled_languages[lang]["version"]}
-      return json.dumps({"languages": languages})
+    class execute:
+        def POST(self):
+            web.header('Content-Type', 'text/json')
+            data = web.data()
+            try:
+                data = JSONWrapper(json.loads(data))
+            except ValueError:
+                data = web.input()
 
-  app = web.application((
-      '/', 'index',
-      '/execute', 'execute',
-      '/info', 'info',
-    ), locals())
+            timelimit = getattr(data, 'timelimit', None)
+            timelimit = float(timelimit) if timelimit else None
 
-  return app
+            stdin = [data.stdin] if not type(data.stdin) == list else data.stdin
+            try:
+                results = wrapper.run(data.language, data.source, data.stdin, custom_timelimit=timelimit)
+                return json.dumps(results)
+            except straitjacket.InputError as ex:
+                LOGGER.error("Input error: {0}".format(ex))
+                raise web.badrequest()
+            except AttributeError as ex:
+                LOGGER.error("Attribute error: {0}".format(ex))
+                raise web.badrequest()
+
+    class info:
+        def GET(self):
+            web.header('Content-Type', 'text/json')
+            return json.dumps({'languages': {
+                language.name   : {
+                    'visible_name'  : language.visible_name,
+                    'version'       : language.version
+                } for language in wrapper.languages.values()
+            }})
+
+    app = web.application((
+            '/', 'index',
+            '/execute', 'execute',
+            '/info', 'info',
+        ), locals())
+
+    return app
 
 if __name__ == "__main__":
-    webapp().run()
+        webapp().run()
 application = webapp().wsgifunc()

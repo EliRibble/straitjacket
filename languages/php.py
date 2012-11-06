@@ -13,8 +13,7 @@ LanguageTest('test-simple', php,
                   ),
     stdout      = 'hi from php',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', php,
     source      = ( '<? $fh = fopen("/etc/hosts", "r");                          \n'
@@ -23,14 +22,12 @@ LanguageTest('test-apparmor', php,
                   ),
     stdout      = '\nWarning: fopen\(/etc/hosts\): failed to open stream: Permission denied in',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-rlimit', php,
     source      = ( '<? echo pcntl_fork(); ?>                                    \n'
                   ),
     stdout      = '\nWarning: pcntl_fork\(\): Error 11',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 

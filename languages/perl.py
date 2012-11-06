@@ -15,8 +15,7 @@ LanguageTest('test-simple', perl,
                   ),
     stdout      = 'hello from perl',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', perl,
     source      = ( 'open FILE, "/etc/hosts" or die $!;                          \n'
@@ -26,8 +25,7 @@ LanguageTest('test-apparmor', perl,
                   ),
     stdout      = '',
     stderr      = 'Permission denied at',
-    returncode  = 13,
-    error       = 'runtime_error')
+    returncode  = 13)
 
 LanguageTest('test-rlimit', perl,
     source      = ( 'my $pid = fork();                                           \n'
@@ -37,6 +35,5 @@ LanguageTest('test-rlimit', perl,
                   ),
     stdout      = 'undefined',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 

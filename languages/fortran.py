@@ -16,8 +16,7 @@ LanguageTest('test-simple', fortran,
                   ),
     stdout      = ' yay fortran\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-rlimit', fortran,
     source      = ( 'program rlimittest                                          \n'
@@ -37,8 +36,7 @@ LanguageTest('test-rlimit', fortran,
                   ),
     stdout      = ' starting allocation\n',
     stderr      = '',
-    returncode  = -11,
-    error       = 'runtime_error')
+    returncode  = -11)
 
 LanguageTest('test-apparmor', fortran,
     source      = ( 'program apparmortest                                        \n'
@@ -49,6 +47,5 @@ LanguageTest('test-apparmor', fortran,
                   ),
     stdout      = '',
     stderr      = 'Permission denied trying to open file "/etc/hosts"',
-    returncode  = 2,
-    error       = 'runtime_error')
+    returncode  = 2)
 

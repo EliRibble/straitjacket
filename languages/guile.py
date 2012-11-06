@@ -13,8 +13,8 @@ LanguageTest('test-simple', guile,
                   ),
     stdout      = 'hi from guile\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
+    
 
 LanguageTest('test-apparmor', guile,
     source      = ( '(with-input-from-file "/etc/passwd" (lambda ()              \n'
@@ -25,14 +25,12 @@ LanguageTest('test-apparmor', guile,
                   ),
     stdout      = '',
     stderr      = 'ERROR: In procedure open-file:\nERROR: Permission denied: "/etc/passwd"\n',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 
 LanguageTest('test-rlimit', guile,
     source      = ( '(begin (display (make-string 1073741824)) (newline))        \n'
                   ),
     stdout      = '',
     stderr      = 'FATAL: memory error in realloc\n',
-    returncode  = -6,
-    error       = 'runtime_error')
+    returncode  = -6)
 

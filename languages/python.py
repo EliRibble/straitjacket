@@ -14,8 +14,7 @@ LanguageTest('test-simple', python,
                   ),
     stdout      = 'hello from python\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-rlimit', python,
     source      = ( 'import os                                                   \n'
@@ -23,14 +22,12 @@ LanguageTest('test-rlimit', python,
                   ),
     stdout      = '',
     stderr      = 'OSError: \[Errno 11\] Resource temporarily unavailable',
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 
 LanguageTest('test-apparmor', python,
     source      = ( 'print file("/etc/hosts").read()                             \n'
                   ),
     stdout      = '',
     stderr      = "Permission denied: '/etc/hosts'",
-    returncode  = 1,
-    error       = 'runtime_error')
+    returncode  = 1)
 

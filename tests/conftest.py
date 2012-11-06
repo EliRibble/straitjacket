@@ -21,6 +21,9 @@ def pytest_addoption(parser):
     parser.addoption('--test', action='store', dest='test', default=None, help='Run only the specified test')
 
 def pytest_generate_tests(metafunc):
+    if 'do_json' in metafunc.fixturenames:
+        metafunc.parametrize('do_json', (False, True))
+
     if 'language' in metafunc.fixturenames:
         if metafunc.config.option.languages:
             test_languages = languages.get(metafunc.config.option.languages.split(','))

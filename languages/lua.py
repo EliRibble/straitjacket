@@ -14,22 +14,19 @@ LanguageTest('test-simple', lua,
                   ),
     stdout      = 'hi from lua\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-apparmor', lua,
     source      = ( 'print(io.open("/etc/hosts", "r"))                           \n'
                   ),
     stdout      = 'nil\t/etc/hosts: Permission denied\t13\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
 LanguageTest('test-rlimit', lua,
     source      = ( 'print(os.execute("/bin/ls"))                                \n'
                   ),
     stdout      = '-1\n',
     stderr      = '',
-    returncode  = 0,
-    error       = None)
+    returncode  = 0)
 
