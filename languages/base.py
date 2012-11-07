@@ -2,9 +2,6 @@
 import subprocess
 import re
 
-from lib import exec_profiles
-import straitjacket_settings
-
 class Language(object):
     def __init__(self,
             name,
