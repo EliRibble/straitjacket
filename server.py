@@ -57,7 +57,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
         wrapper = straitjacket.StraitJacket(config_dir, skip_language_checks=skip_language_checks)
 
 
-    class index:
+    class index: # pylint: disable=W0612
         def __init__(self):
             self.index_html = None
 
@@ -71,7 +71,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
             web.header('Content-Type', 'text/html')
             return self.index_html
 
-    class execute:
+    class execute: # pylint: disable=W0612
         def POST(self):
             web.header('Content-Type', 'text/json')
             data = web.data()
@@ -94,7 +94,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
                 LOGGER.error("Attribute error: {0}".format(ex))
                 raise web.badrequest()
 
-    class info:
+    class info: # pylint: disable=W0612
         def GET(self):
             web.header('Content-Type', 'text/json')
             return json.dumps({'languages': {
