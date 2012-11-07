@@ -37,3 +37,14 @@ LanguageTest('test-rlimit', javascript,
     stderr      = "terminate called after throwing an instance of 'std::bad_alloc'",
     returncode  = -6)
 
+LanguageTest('test-stdin', javascript,
+    source      = ( "process.stdin.resume();                                                    \n"
+                    "process.stdin.setEncoding('utf8')                                          \n"
+                    "process.stdin.on('data', function (chunk) {    "
+                    "   process.stdout.write(chunk);"
+                    "});" ),
+    stdout      = "some input",
+    stdin       = "some input",
+    stderr      = "",
+    returncode  = 0)
+    
