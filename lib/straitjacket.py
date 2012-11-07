@@ -25,11 +25,7 @@ import subprocess
 import functools
 
 import languages
-
-class Error_(Exception): pass
-class InputError(Error_): pass
-class ConfigError(Error_): pass
-class LanguageInitError(ConfigError): pass
+from errors import InputError
 
 REQUIRED_TESTS = ["test-simple", "test-rlimit", "test-apparmor"]
 def stderr_log(msg): print >>sys.stderr, msg
