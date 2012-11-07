@@ -36,18 +36,18 @@ def stderr_log(msg): print >>sys.stderr, msg
 
 class StraitJacket(object):
 
-  def __init__(self, config_dir, log_method=None, skip_language_checks=False):
-    self.log_method = log_method or stderr_log
+    def __init__(self, config_dir, log_method=None, skip_language_checks=False):
+        self.log_method = log_method or stderr_log
 
-    self.languages = {language.name: language for language in languages.all()}
+        self.languages = {language.name: language for language in languages.all()}
 
-    if not skip_language_checks:
-      self.log_method("Initialized %d languages" % (
-          len(self.languages)))
+        if not skip_language_checks:
+            self.log_method("Initialized %d languages" % (
+                    len(self.languages)))
 
-  def run(self, language, source, stdin, custom_timelimit=None):
-    try:
-        return self.languages[language].execute(source, stdin, custom_timelimit)
-    except KeyError as k:
-        raise InputError, "invalid language"
+    def run(self, language, source, stdin, custom_timelimit=None):
+        try:
+            return self.languages[language].execute(source, stdin, custom_timelimit)
+        except KeyError as k:
+            raise InputError, "invalid language"
 
