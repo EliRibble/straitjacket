@@ -12,12 +12,12 @@ def _import_submodules():
         _import_submodule(module_name)
 
 def _import_submodule(name):
-    import languages
+    import languages # pylint: disable=W0406
     module = importlib.import_module('languages.' + name)
     setattr(languages, name, getattr(module, name))
     
-def all():
-    import languages
+def all(): # pylint: disable=W0622
+    import languages # pylint: disable=W0406
     import languages.base
     _import_submodules()
     found = []
@@ -28,7 +28,7 @@ def all():
     return found
 
 def get(language_name):
-    import languages
+    import languages # pylint: disable=W0406
     try:
         _import_submodule(language_name)
         return getattr(languages, language_name)
