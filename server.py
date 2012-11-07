@@ -85,7 +85,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
 
             stdin = [data.stdin] if not type(data.stdin) == list else data.stdin
             try:
-                results = wrapper.run(data.language, data.source, data.stdin, custom_timelimit=timelimit)
+                results = wrapper.run(data.language, data.source, stdin, custom_timelimit=timelimit)
                 return json.dumps(results)
             except straitjacket.InputError as ex:
                 LOGGER.error("Input error: {0}".format(ex))
