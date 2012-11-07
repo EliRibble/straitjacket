@@ -49,7 +49,8 @@ class BaseProfile(object):
     def _kill(self, pid, completed, max_runtime=None):
         max_runtime = max_runtime if max_runtime else self.config.MAX_RUNTIME
         for _ in xrange(max(int(max_runtime), 1)):
-            if completed: return
+            if completed:
+                return
             time.sleep(1)
         if not completed:
             os.kill(pid, 9)
@@ -63,7 +64,8 @@ class BaseProfile(object):
         start_time = time.time()
 
         def preexec_fn():
-            if chdir: os.chdir(chdir)
+            if chdir:
+                os.chdir(chdir)
             aa_change_onexec(aa_profile)
 
         proc = subprocess.Popen(user_program, executable=executable,
@@ -100,7 +102,8 @@ class BaseProfile(object):
             'runtime'       : runtime
         }
 
-    def _filename_gen(self): return base64.b64encode(os.urandom(42), "_-")
+    def _filename_gen(self):
+        return base64.b64encode(os.urandom(42), "_-")
 
     def run(self, language, source, stdin, custom_timelimit=None):
         raise NotImplementedError
@@ -108,7 +111,8 @@ class BaseProfile(object):
 
 class CompilerProfile(BaseProfile):
 
-    def __init__(self, config): BaseProfile.__init__(self, config)
+    def __init__(self, config):
+        BaseProfile.__init__(self, config)
 
     def run(self, language, source, stdins, custom_timelimit=None):
         stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
@@ -179,15 +183,18 @@ class CompilerProfile(BaseProfile):
 
         finally:
             shutil.rmtree(source_dir)
-            if os.path.exists(compiler_file): os.unlink(compiler_file)
-            if os.path.exists(executable_file): os.unlink(executable_file)
+            if os.path.exists(compiler_file):
+                os.unlink(compiler_file)
+            if os.path.exists(executable_file):
+                os.unlink(executable_file)
 
     def default_apparmor_profile(self):
         return self.config.APPARMOR_PROFILES["compiler"]
 
 class InterpreterProfile(BaseProfile):
 
-    def __init__(self, config): BaseProfile.__init__(self, config)
+    def __init__(self, config):
+        BaseProfile.__init__(self, config)
 
     def run(self, language, source, stdins, custom_timelimit=None):
         stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
@@ -220,7 +227,8 @@ class InterpreterProfile(BaseProfile):
 
 class VMProfile(BaseProfile):
 
-    def __init__(self, config): BaseProfile.__init__(self, config)
+    def __init__(self, config):
+        BaseProfile.__init__(self, config)
 
     def run(self, language, source, stdins, custom_timelimit=None):
         stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
