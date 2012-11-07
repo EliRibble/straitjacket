@@ -76,11 +76,7 @@ class BaseProfile(object):
 
         kill_thread.start()
         returncode = None
-        try:
-            stdout, stderr = proc.communicate(stdin)
-        except Exception, e:
-            stdout, stderr = "", str(e)
-            returncode = None
+        stdout, stderr = proc.communicate(stdin)
         runtime = time.time() - start_time
         completed.append(True)
         kill_thread.join()
