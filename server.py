@@ -43,8 +43,8 @@ INDEX_HTML = """
 """
 
 class JSONWrapper(object):
-    def __init__(self, json):
-        self.json = json
+    def __init__(self, my_json):
+        self.json = my_json
 
     def __getattr__(self, name):
         try:
