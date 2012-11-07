@@ -23,7 +23,8 @@ import languages
 from errors import InputError
 
 REQUIRED_TESTS = ["test-simple", "test-rlimit", "test-apparmor"]
-def stderr_log(msg): print >>sys.stderr, msg
+def stderr_log(msg):
+    print >> sys.stderr, msg
 
 class StraitJacket(object):
 
