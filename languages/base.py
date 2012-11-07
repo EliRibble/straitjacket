@@ -65,11 +65,11 @@ class Language(object):
         return "Language {0}".format(self.name)
 
 class LanguageTest(object):
-    def __init__(self, name, language, source, stdout='', stderr='', returncode=0, status='success'):
+    def __init__(self, name, language, source, stdout='', stderr='', returncode=0, status='success', stdin=None):
         self.name           = name
         self.language       = language
         self.source         = source
-        self.stdin          = None
+        self.stdin          = stdin
         self.returncode     = returncode
         self.status         = status
         self.stdout_pattern = stdout
