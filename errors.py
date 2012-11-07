@@ -6,4 +6,6 @@ class ConfigError(StraitjacketError):
     pass
 class LanguageInitError(ConfigError):
     pass
+class AppArmorProtectionFailure(StraitjacketError):
+    pass
 

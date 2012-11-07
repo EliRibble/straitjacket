@@ -25,6 +25,7 @@ import base64
 import shutil
 import logging
 
+from errors import AppArmorProtectionFailure
 try:
     import LibAppArmor
 except ImportError:
@@ -34,9 +35,6 @@ __author__ = "JT Olds"
 __copyright__ = "Copyright 2011 Instructure, Inc."
 __license__ = "AGPLv3"
 __email__ = "jt@instructure.com"
-
-class Error_(Exception): pass
-class AppArmorProtectionFailure(Error_): pass
 
 def aa_change_onexec(profile):
     if LibAppArmor is None or LibAppArmor.aa_change_onexec(profile) != 0:
