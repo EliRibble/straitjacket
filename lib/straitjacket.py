@@ -40,6 +40,6 @@ class StraitJacket(object):
     def run(self, language, source, stdin, custom_timelimit=None):
         try:
             return self.languages[language].execute(source, stdin, custom_timelimit)
-        except KeyError as k:
+        except KeyError:
             raise InputError, "invalid language"
 
