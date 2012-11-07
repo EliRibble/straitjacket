@@ -51,7 +51,7 @@ class Language(object):
 
     def get_version(self):
         proc = subprocess.Popen([self.binary, self.version_switch], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        stdout, stderr = proc.communicate()
+        stdout = proc.communicate()[0]
         if self.version_pattern:
             m = re.search(self.version_pattern, stdout)
             if m:
