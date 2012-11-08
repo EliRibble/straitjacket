@@ -8,6 +8,7 @@ function setup() {
     editor.getSession().setMode('ace/mode/javascript');
 
     $('#execute').click(onExecuteClick);
+    $('#clear').click(function(){ editor.setValue('') });
     disableButton();
 }
 
