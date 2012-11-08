@@ -64,7 +64,11 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
             timelimit = getattr(data, 'timelimit', None)
             timelimit = float(timelimit) if timelimit else None
 
-            stdin = [data.stdin] if not type(data.stdin) == list else data.stdin
+            if hasattr(data, 'stdin'):
+                stdin = [data.stdin] if not type(data.stdin) == list else data.stdin
+            else:
+                stdin = [None]
+
             try:
                 results = wrapper.run(data.language, data.source, stdin, custom_timelimit=timelimit)
                 return json.dumps(results)
