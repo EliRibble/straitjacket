@@ -26,21 +26,8 @@ from lib import straitjacket
 
 LOGGER = logging.getLogger('server')
 
-DEFAULT_CONFIG_DIR = os.path.join(os.path.realpath(os.path.dirname(__file__)),
-        "config")
-
-INDEX_HTML = """
-<h1>welcome to straitjacket</h1>
-<form method="post" action="/execute">
-<dl>
-<dt>source:</dt><dd><textarea name="source" rows=8 cols=50></textarea></dd>
-<dt>stdin:</dt><dd><textarea name="stdin" rows=8 cols=50></textarea></dd>
-<dt>language:</dt><dd><select name="language">
-%(languages)s
-</select></dd></dl>
-<input type="submit"/>
-</form>
-"""
+ROOT_DIRECTORY = os.path.realpath(os.path.dirname(__file__))
+DEFAULT_CONFIG_DIR = os.path.join(ROOT_DIRECTORY, "config")
 
 class JSONWrapper(object):
     def __init__(self, my_json):
@@ -52,24 +39,18 @@ class JSONWrapper(object):
         except KeyError:
             raise AttributeError
 
+def _get_file_content(file_path):
+    with open(file_path, 'r') as f:
+        return f.read()
+
 def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=False):
     if not wrapper:
         wrapper = straitjacket.StraitJacket(config_dir, skip_language_checks=skip_language_checks)
 
 
     class index: # pylint: disable=W0612
-        def __init__(self):
-            self.index_html = None
-
         def GET(self):
-            if not self.index_html:
-                self.index_html = INDEX_HTML % {"languages": "\n".join(
-                        ('<option value="%s">%s - %s</option>' % (lang,
-                         wrapper.languages[lang].visible_name,
-                         wrapper.languages[lang].version)
-             for lang in sorted(wrapper.languages.keys())))}
-            web.header('Content-Type', 'text/html')
-            return self.index_html
+            return _get_file_content(os.path.join(ROOT_DIRECTORY, 'static/html/index.html'))
 
     class execute: # pylint: disable=W0612
         def POST(self):
@@ -83,7 +64,11 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
             timelimit = getattr(data, 'timelimit', None)
             timelimit = float(timelimit) if timelimit else None
 
-            stdin = [data.stdin] if not type(data.stdin) == list else data.stdin
+            if hasattr(data, 'stdin'):
+                stdin = [data.stdin] if not type(data.stdin) == list else data.stdin
+            else:
+                stdin = [None]
+
             try:
                 results = wrapper.run(data.language, data.source, stdin, custom_timelimit=timelimit)
                 return json.dumps(results)
@@ -102,7 +87,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
                     'visible_name'  : language.visible_name,
                     'version'       : language.version
                 } for language in wrapper.languages.values()
-            }})
+            }}, sort_keys=True)
 
     app = web.application((
             '/', 'index',

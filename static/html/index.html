@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <title>Straitjacket</title>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+        <script src="static/js/index.js"></script>
+        <script src="static/js/jquery.json-2.3.min.js"></script>
+        
+ 
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet"></link>
+
+        <link href="static/css/index.css" rel="stylesheet"></link>
+</style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Welcome to Straitjacket</h1>
+            <p>Please select a language at the right and type your code below to have it executed</p>
+            <div class="row">
+                <div class="span7">
+                    <div id="editor">Your code goes here</div>
+                </div>
+                <div class="span5">
+                    <label for="stdin">Stdin:</label>
+                    <textarea id="stdin" rows="4" cols="50"></textarea>
+                    <br/>
+                    <div class="btn-group" >
+                        <button id="execute" type="button" class="btn disabled">Execute</button>
+                        <button id="clear" type="button" class="btn">Clear</button>
+                    </div>
+                    <div class="row">
+                        <div class="span2">
+                            <label for="language">Language: </label>
+                            <label for="status">Status: </label>
+                        </div>
+                        <div class="span3">
+                            <select name="language" id="language"/></select>
+                            <div>
+                                <pre id="status"></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion" id="results_accordion" style="display:none">
+                        <div class="accordion-group">
+                            <div class="accordion-heading compilation">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#results_accordion" href="#collapseCompilation">Compilation</a>
+                            </div>
+                            <div id="collapseCompilation" class="accordion-body collapse compilation">
+                                <div class="accordion-inner">
+                                    <table>
+                                        <tr>
+                                            <td><label for="compilation-command">Command</label></td>
+                                            <td><pre id="compilation-command" class="prettyprint"></pre></td>
+                                        </tr>
+                                        <tr>
+                                            <td><label for="compilation-stdout">stdout</label></td>
+                                            <td><pre id="compilation-stdout" class="prettyprint"></pre></td>
+                                        </tr>
+                                        <tr>
+                                            <td><label for="compilation-stderr">stderr</label></td>
+                                            <td><pre id="compilation-stderr" class="prettyprint"></pre></td>
+                                        </tr>
+                                        <tr>
+                                            <td><label for="compilation-returncode">returncode</label></td>
+                                            <td><pre id="compilation-returncode" class="prettyprint"></pre></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="accordion-heading stdout">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#results_accordion" href="#collapseStdout">stdout</a>
+                            </div>
+                            <div id="collapseStdout" class="accordion-body collapse stdout">
+                                <div class="accordion-inner">
+                                    <pre id="stdout" class="prettyprint linenums"></pre>
+                                </div>
+                            </div>
+
+                            <div class="accordion-heading stderr">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#results_accordion" href="#collapseStderr">stderr</a>
+                            </div>
+                            <div id="collapseStderr" class="accordion-body collapse stderr">
+                                <div class="accordion-inner">
+                                    <pre id="stderr" class="prettyprint linenums"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    </body>
+</html>
