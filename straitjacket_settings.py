@@ -1,4 +1,5 @@
 MAX_RUNTIME = 15
+
 DIRECTORIES = {
     'temp_root' : '/var/local/straitjacket/tmp',
     'source'    : '/var/local/straitjacket/tmp/source',
