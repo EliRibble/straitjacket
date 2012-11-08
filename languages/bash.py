@@ -31,3 +31,12 @@ LanguageTest('test-rlimit', bash,
      stderr     = 'fork: retry: No child processes',
      returncode = 254)
      
+LanguageTest('test-stdin', bash,
+    source      = (
+        'while read LINE; do\n'
+        '   echo $LINE;     \n'
+        'done               \n'
+        'echo $LINE;'       ),
+    stdin       = "input line 1\ninput line2",
+    stdout      = "input line 1\ninput line2",
+    returncode  = 0)
