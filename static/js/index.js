@@ -68,7 +68,7 @@ function onExecutionComplete(data, textStatus, jqXHR) {
         $('.returncode').show();
         $('#stdout').html(data.runs[0].stdout);
         $('#stderr').html(data.runs[0].stderr);
-        if( data.runs[0] != 0 ) {
+        if( data.runs[0].returncode != '0' ) {
             $('#status').html($('#status').html() + ' (' + data.runs[0].returncode + ')');
         }
     } else {
