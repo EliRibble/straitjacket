@@ -60,6 +60,12 @@ function onExecutionComplete(data, textStatus, jqXHR) {
         $('#compilation-stdout').html(data.compilation.stdout);
         $('#compilation-stderr').html(data.compilation.stderr);
         $('#compilation-returncode').html(data.compilation.returncode);
+        if( data.compilation.returncode != '0' ) {
+            $('.accordion-body').collapse('hide');
+            $('#collapseCompilation').collapse('show');
+        } else {
+            $('#collapseCompilation').collapse('hide');
+        }
     } else {
         $('.compilation').hide();
     }
@@ -68,6 +74,11 @@ function onExecutionComplete(data, textStatus, jqXHR) {
         $('.stderr').show();
         $('.returncode').show();
         $('#stdout').html(data.runs[0].stdout);
+        if( data.runs[0].stderr != '' || data.runs[0].returncode != '0' ) {
+            $('#collapseStderr').collapse('show');
+        } else {
+            $('#collapseStdout').collapse('show');
+        }
         $('#stderr').html(data.runs[0].stderr);
         if( data.runs[0].returncode != '0' ) {
             $('#status').html($('#status').html() + ' (' + data.runs[0].returncode + ')');
