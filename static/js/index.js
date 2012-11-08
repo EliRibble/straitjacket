@@ -43,11 +43,11 @@ function onExecuteClick() {
         type: 'POST',
         url: '/execute',
         success: onExecutionComplete,
-        data: {
+        data: $.toJSON({
             language: language,
             source: source,
             stdin: stdin
-        }
+        })
     });
 }
 
