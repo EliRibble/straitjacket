@@ -43,6 +43,8 @@ function onExecuteClick() {
         type: 'POST',
         url: '/execute',
         success: onExecutionComplete,
+        processData: false,
+        contentType: 'application/json',
         data: $.toJSON({
             language: language,
             source: source,
