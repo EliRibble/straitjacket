@@ -28,7 +28,7 @@ function onGetLanguageInfo(data, textStatus, jqXHR) {
     var $languages = $('#language');
     $.each(data.languages, function(language_name, info) {
         $languages.append(
-            $('<option></option>').val(language_name).html(info.visible_name)
+            $('<option></option>').val(language_name).html(language_name + ' ' + info.version)
         );
     });
     enableButton();
