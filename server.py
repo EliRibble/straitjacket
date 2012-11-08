@@ -87,7 +87,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
                     'visible_name'  : language.visible_name,
                     'version'       : language.version
                 } for language in wrapper.languages.values()
-            }})
+            }}, sort_keys=True)
 
     app = web.application((
             '/', 'index',
