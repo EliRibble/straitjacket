@@ -24,7 +24,8 @@ def all(): # pylint: disable=W0622
     for key in dir(languages):
         item = getattr(languages, key)
         if isinstance(item, languages.base.Language):
-            found.append(item)
+            if item.enabled:
+                found.append(item)
     return found
 
 def get(language_name):
