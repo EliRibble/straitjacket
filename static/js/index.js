@@ -36,15 +36,17 @@ function onGetLanguageInfo(data, textStatus, jqXHR) {
 
 function onExecuteClick() {
     disableButton();
-    var source = editor.getValue();
-    var language = $('#language').val();
+    var source      = editor.getValue();
+    var language    = $('#language').val();
+    var stdin       = $('#stdin').val();
     $.ajax({
         type: 'POST',
         url: '/execute',
         success: onExecutionComplete,
         data: {
             language: language,
-            source: source
+            source: source,
+            stdin: stdin
         }
     });
 }
