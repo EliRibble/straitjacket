@@ -10,6 +10,8 @@ function setup() {
     $('#execute').click(onExecuteClick);
     $('#clear').click(function(){ editor.setValue('') });
     disableButton();
+    
+    $('#language').change(onLanguageChange);
 }
 
 function disableButton() {
@@ -32,6 +34,19 @@ function onGetLanguageInfo(data, textStatus, jqXHR) {
         );
     });
     enableButton();
+}
+
+function onLanguageChange(eventObject) {
+    var language = $('#language').val();
+    var mode = language.toLowerCase();
+    if( ['c', 'c++', 'objective-c'].indexOf(mode) >= 0 ) {
+        mode = 'c_cpp';
+    }
+    try {
+        editor.getSession().setMode('ace/mode/' + mode);
+    } catch(err) {
+        editor.getSession().setMode('ace/mode/c_cpp');
+    }
 }
 
 function onExecuteClick() {
