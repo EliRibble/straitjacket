@@ -1,0 +1,10 @@
+#include <tunables/global>
+
+profile straitjacket/compiled/objective-c {
+  #include <abstractions/base>
+  #include <abstractions/straitjacket-base>
+
+  /var/local/straitjacket/tmp/execute/?* r,
+  /etc/passwd r,
+  /proc/** r,
+}

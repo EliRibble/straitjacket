@@ -1,6 +1,5 @@
 #include <tunables/global>
 
-#profile straitjacket/compiler/objective-c flags=(complain) {
 profile straitjacket/compiler/objective-c {
   #include <abstractions/base>
   #include <abstractions/straitjacket-base>
@@ -10,4 +9,5 @@ profile straitjacket/compiler/objective-c {
   /var/local/straitjacket/tmp/compiler/?* rw,
   /usr/lib/x*-linux-gnu/lib* mr,
   /usr/lib/gcc/x*-linux-gnu/*/cc1* rix,
+  /etc/ld.so.conf r,
 }
