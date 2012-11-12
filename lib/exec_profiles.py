@@ -110,6 +110,7 @@ class CompilerProfile(BaseProfile):
         BaseProfile.__init__(self, config)
 
     def run(self, language, source, stdins, timelimit=30):
+        compile_start_time = time.time()
         stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
         source_dir = os.path.join(self.config.DIRECTORIES['source'], self._filename_gen())
         source_file = os.path.join(source_dir, language.filename)
@@ -122,7 +123,6 @@ class CompilerProfile(BaseProfile):
             logging.debug("Wrote the following source to %s: %s", source_file, source)
 
             completed = []
-            compile_start_time = time.time()
             logging.debug("Compiling with profile %s", language.apparmor_profile)
             def compiler_preexec():
                 os.environ["TMPDIR"] = self.config.DIRECTORIES["compiler"]
@@ -166,12 +166,15 @@ class CompilerProfile(BaseProfile):
             else:
                 compiled_profile = self.config.APPARMOR_PROFILES["compiled"]
 
+            time_left = timelimit - compilation_time
+            per_run_timelimit = time_left / len(stdins)
+
             run_results = [self._run_user_program(["straitjacket-binary"],
                             stdin,
                             compiled_profile,
                             compilation_time,
                             executable_file,
-                            timelimit=timelimit) for stdin in stdins]
+                            timelimit=per_run_timelimit) for stdin in stdins]
             results['runs'] = run_results
             results['status'] = 'success'
             return results
@@ -204,12 +207,13 @@ class InterpreterProfile(BaseProfile):
                 command = language.interpretation_command(filename)
             else:
                 command = [language.binary, filename]
+            per_run_timelimit = timelimit / len(stdins)
             return {
                 'status'    : 'success',
                 'runs'      : [self._run_user_program(command,
                                 stdin,
                                 language.apparmor_profile,
-                                timelimit=timelimit,
+                                timelimit=per_run_timelimit,
                                 source_file=filename) for stdin in stdins]
             }
 
@@ -226,9 +230,9 @@ class VMProfile(BaseProfile):
         BaseProfile.__init__(self, config)
 
     def run(self, language, source, stdins, timelimit=30):
+        compile_start_time = time.time()
         stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
-        source_dir = os.path.join(self.config.DIRECTORIES["source"],
-                self._filename_gen())
+        source_dir = os.path.join(self.config.DIRECTORIES["source"], self._filename_gen())
         source_file = os.path.join(source_dir, language.filename)
         try:
             os.mkdir(source_dir)
@@ -239,7 +243,6 @@ class VMProfile(BaseProfile):
                 f.close()
 
             completed = []
-            compile_start_time = time.time()
 
             logging.info("Switching to apparmor profile %s", language.compiler_apparmor_profile)
             def compiler_preexec():
@@ -277,12 +280,15 @@ class VMProfile(BaseProfile):
                 results['status'] = 'compilation timeout' if 'killed' in completed else 'compilation failed'
                 return results
 
+         
+            time_left = timelimit - compilation_time
+            per_run_timelimit = time_left / len(stdins)   
             run_results = [self._run_user_program(language.vm_command(source_file),
                                 stdin,
                                 language.vm_apparmor_profile,
                                 compilation_time,
                                 chdir=source_dir,
-                                timelimit=timelimit,
+                                timelimit=per_run_timelimit,
                                 source_file=source_file)
                             for stdin in stdins]
             results['status'] = 'success'
