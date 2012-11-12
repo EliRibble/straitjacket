@@ -4,7 +4,7 @@ import straitjacket_settings
 
 class TclLanguage(Language):
     def get_version(self):
-        return self.execute( "puts $tcl_version", None, None )['runs'][0]['stdout'].rstrip()
+        return self.execute( "puts $tcl_version", None )['runs'][0]['stdout'].rstrip()
 
 tcl = TclLanguage('Tcl',
     profile             = exec_profiles.InterpreterProfile(straitjacket_settings),
