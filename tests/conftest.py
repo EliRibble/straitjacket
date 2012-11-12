@@ -12,7 +12,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 @pytest.fixture
 def webapp():
-    wrapper = server.straitjacket.StraitJacket(server.DEFAULT_CONFIG_DIR)
+    wrapper = server.straitjacket.StraitJacket()
     webapp = server.webapp(wrapper)
     return webapp
 
