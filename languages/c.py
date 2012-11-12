@@ -5,6 +5,7 @@ import straitjacket_settings
 c = Language('C',
     profile                     = exec_profiles.CompilerProfile(straitjacket_settings),
     binary                      = 'gcc',
+    compilation_command         = lambda source_file, compiler_file: ['gcc', '-std=c99', '-o', compiler_file, source_file],
     apparmor_profile            = 'straitjacket/compiler/default',
     compiled_apparmor_profile   = 'straitjacket/compiled/default',
     filename                    = 'source.c',)
