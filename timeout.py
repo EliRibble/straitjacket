@@ -58,7 +58,7 @@ class ProcessTimeout(object):
         self.timeout = KillProcessThread(seconds, pid)
 
     def __enter__(self):
-        LOGGER.debug("Starting timeout process for %d with %d seconds timeout", self.timeout.pid, self.timeout.seconds)
+        LOGGER.debug("Starting timeout process for %s with %s seconds timeout", self.timeout.pid, self.timeout.seconds)
         self.timeout.run()
 
     def __exit__(self, *args, **kwargs):
