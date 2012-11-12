@@ -26,6 +26,8 @@ import shutil
 import logging
 
 from errors import AppArmorProtectionFailure
+from timeout import ProcessTimeout
+
 try:
     import LibAppArmor
 except ImportError:
@@ -56,10 +58,7 @@ class BaseProfile(object):
             os.kill(pid, 9)
             completed.append("killed")
 
-    def _run_user_program(self, user_program, stdin, aa_profile, time_used=0, executable=None, chdir=None, custom_timelimit=None, source_file=None):
-        if custom_timelimit == None:
-            custom_timelimit = float('inf')
-        completed = []
+    def _run_user_program(self, user_program, stdin, aa_profile, time_used=0, executable=None, chdir=None, timelimit=30, source_file=None):
         runtime = None
         start_time = time.time()
 
@@ -68,24 +67,24 @@ class BaseProfile(object):
                 os.chdir(chdir)
             aa_change_onexec(aa_profile)
 
-        proc = subprocess.Popen(user_program, executable=executable,
-                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                close_fds=True, preexec_fn=preexec_fn)
-        kill_thread = threading.Thread(target=self._kill, args=(proc.pid, completed,
-                min(self.config.MAX_RUNTIME - time_used, custom_timelimit)))
+        proc = subprocess.Popen(user_program,
+                                executable=executable,
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                close_fds=True,
+                                preexec_fn=preexec_fn)
 
-        kill_thread.start()
-        returncode = None
-        stdout, stderr = proc.communicate(stdin)
+        timeout = min(self.config.MAX_RUNTIME - time_used, timelimit)
+        timer = ProcessTimeout(timeout, proc.pid)
+        with timer:
+            stdout, stderr = proc.communicate(stdin)
+        returncode = proc.wait()
+
         runtime = time.time() - start_time
-        completed.append(True)
-        kill_thread.join()
 
-        if returncode is None:
-            returncode = proc.returncode
-
-        if "killed" in completed or runtime > custom_timelimit:
-            status = "timeout"
+        if timer.timedout:
+            status = 'timeout'
             returncode = None
         else:
             status = "success"
@@ -101,7 +100,7 @@ class BaseProfile(object):
     def _filename_gen(self):
         return base64.b64encode(os.urandom(42), "_-")
 
-    def run(self, language, source, stdin, custom_timelimit=None):
+    def run(self, language, source, stdin, timelimit=30):
         raise NotImplementedError
 
 
@@ -110,7 +109,7 @@ class CompilerProfile(BaseProfile):
     def __init__(self, config):
         BaseProfile.__init__(self, config)
 
-    def run(self, language, source, stdins, custom_timelimit=None):
+    def run(self, language, source, stdins, timelimit=30):
         stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
         source_dir = os.path.join(self.config.DIRECTORIES['source'], self._filename_gen())
         source_file = os.path.join(source_dir, language.filename)
@@ -172,7 +171,7 @@ class CompilerProfile(BaseProfile):
                             compiled_profile,
                             compilation_time,
                             executable_file,
-                            custom_timelimit=custom_timelimit) for stdin in stdins]
+                            timelimit=timelimit) for stdin in stdins]
             results['runs'] = run_results
             results['status'] = 'success'
             return results
@@ -192,7 +191,7 @@ class InterpreterProfile(BaseProfile):
     def __init__(self, config):
         BaseProfile.__init__(self, config)
 
-    def run(self, language, source, stdins, custom_timelimit=None):
+    def run(self, language, source, stdins, timelimit=30):
         stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
 
         dirname = os.path.join(self.config.DIRECTORIES["source"], self._filename_gen())
@@ -210,7 +209,7 @@ class InterpreterProfile(BaseProfile):
                 'runs'      : [self._run_user_program(command,
                                 stdin,
                                 language.apparmor_profile,
-                                custom_timelimit=custom_timelimit,
+                                timelimit=timelimit,
                                 source_file=filename) for stdin in stdins]
             }
 
@@ -226,7 +225,7 @@ class VMProfile(BaseProfile):
     def __init__(self, config):
         BaseProfile.__init__(self, config)
 
-    def run(self, language, source, stdins, custom_timelimit=None):
+    def run(self, language, source, stdins, timelimit=30):
         stdins = [stdins] if isinstance(stdins, basestring) or stdins is None else stdins
         source_dir = os.path.join(self.config.DIRECTORIES["source"],
                 self._filename_gen())
@@ -283,7 +282,7 @@ class VMProfile(BaseProfile):
                                 language.vm_apparmor_profile,
                                 compilation_time,
                                 chdir=source_dir,
-                                custom_timelimit=custom_timelimit,
+                                timelimit=timelimit,
                                 source_file=source_file)
                             for stdin in stdins]
             results['status'] = 'success'

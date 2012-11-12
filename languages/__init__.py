@@ -1,3 +1,4 @@
+import logging
 import os
 import importlib
 
@@ -13,8 +14,11 @@ def _import_submodules():
 
 def _import_submodule(name):
     import languages # pylint: disable=W0406
-    module = importlib.import_module('languages.' + name)
-    setattr(languages, name, getattr(module, name))
+    try:
+        module = importlib.import_module('languages.' + name)
+        setattr(languages, name, getattr(module, name))
+    except ImportError:
+        logging.exception("Unable to import language %s", name)
     
 def all(): # pylint: disable=W0622
     import languages # pylint: disable=W0406

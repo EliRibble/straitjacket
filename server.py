@@ -80,7 +80,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
                 stdin = [None]
 
             try:
-                results = wrapper.run(data.language, data.source, stdin, custom_timelimit=timelimit)
+                results = wrapper.run(data.language, data.source, stdin, timelimit=timelimit)
                 return json.dumps(results)
             except straitjacket.InputError as ex:
                 LOGGER.error("Input error: {0}".format(ex))

@@ -37,9 +37,9 @@ class StraitJacket(object):
             self.log_method("Initialized %d languages" % (
                     len(self.languages)))
 
-    def run(self, language, source, stdin, custom_timelimit=None):
+    def run(self, language, source, stdin, timelimit=None):
         try:
-            return self.languages[language].execute(source, stdin, custom_timelimit)
+            return self.languages[language].execute(source, stdin, timelimit)
         except KeyError:
             raise InputError, "invalid language"
 

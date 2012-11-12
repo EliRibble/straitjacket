@@ -1,7 +1,7 @@
 
 def sj_run(self, lang, source):
     stdout, stderr, exitstatus, runtime, error = wrapper.run(lang, source, "",
-            custom_timelimit=1.0)
+            timelimit=1.0)
     return (exitstatus, error)
 
 def testCompilerProfileErrors(language, webapp):

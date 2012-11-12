@@ -60,8 +60,8 @@ class Language(object):
     def is_enabled(self):
         return self.enabled
 
-    def execute(self, source, stdin, timelimit=None):
-        return self.profile.run(self, source, stdin, custom_timelimit=timelimit)
+    def execute(self, source, stdin, timelimit=30):
+        return self.profile.run(self, source, stdin, timelimit=timelimit)
 
     def __repr__(self):
         return "Language {0}".format(self.name)
