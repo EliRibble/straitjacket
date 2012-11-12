@@ -45,7 +45,7 @@ class KillProcessThread(TimeoutThread):
         self.timedout = False
 
     def timed_out(self):
-        LOGGER.debug("Killing process %d for having passed the %d timeout period", self.pid, self.seconds)
+        LOGGER.debug("Killing process %d for having passed the %d second timeout period", self.pid, self.seconds)
         self.timedout = True
         try:
             os.kill(self.pid, signal.SIGKILL)
