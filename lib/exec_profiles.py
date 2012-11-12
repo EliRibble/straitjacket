@@ -252,11 +252,10 @@ class VMProfile(BaseProfile):
                 command = language.compilation_command(source_file)
             else:
                 command = [language.binary, source_file]
+
             logging.debug("Compiling with: %s", command)
-            proc = subprocess.Popen(command, stdin=None, stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT, close_fds=True, preexec_fn=compiler_preexec)
-            kill_thread = threading.Thread(target=self._kill, args=(proc.pid,
-                    completed))
+            proc = subprocess.Popen(command, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True, preexec_fn=compiler_preexec)
+            kill_thread = threading.Thread(target=self._kill, args=(proc.pid, completed, language.compiler_timeout))
 
             kill_thread.start()
             compile_out, compile_err = proc.communicate()

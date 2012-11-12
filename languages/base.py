@@ -20,6 +20,7 @@ class Language(object):
             vm_apparmor_profile         = None,
             compilation_command         = None,
             interpretation_command      = None,
+            compiler_timeout            = None
         ):
         self.enabled                    = True
         self.name                       = name
@@ -38,6 +39,7 @@ class Language(object):
         self.compiled_apparmor_profile  = compiled_apparmor_profile
         self.vm_apparmor_profile        = vm_apparmor_profile
         self.compilation_command        = compilation_command
+        self.compiler_timeout           = compiler_timeout
         self.tests                      = []
 
     @property

@@ -9,7 +9,8 @@ scala = Language('Scala',
     vm_command                  = lambda source: ['scala', 'Main'],
     filename                    = 'source.scala',
     compiler_apparmor_profile   = 'straitjacket/compiler/scala',
-    vm_apparmor_profile         = 'straitjacket/compiled/scala')
+    vm_apparmor_profile         = 'straitjacket/compiled/scala',
+    compiler_timeout            = 40)
 
 LanguageTest('test-simple', scala,
     source      = ( 'object Main {                                               \n'
