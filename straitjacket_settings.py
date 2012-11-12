@@ -1,4 +1,11 @@
-MAX_RUNTIME = 15
+# The maximum runtime for a single request
+# This time will be used for everything, compilation, 
+# all of the runs of the program, everything. This is
+# so that our nginx reverse proxy doesn't time out
+# This means that if the user passes in 100 values for
+# stdin then we must run the program 100 times within
+# this time out
+MAX_RUNTIME = 60
 
 DIRECTORIES = {
     'temp_root' : '/var/local/straitjacket/tmp',
