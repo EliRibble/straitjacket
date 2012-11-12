@@ -33,6 +33,8 @@ try:
 except ImportError:
     LibAppArmor = None
 
+LOGGER = logging.getLogger('execution profiles')
+
 __author__ = "JT Olds"
 __copyright__ = "Copyright 2011 Instructure, Inc."
 __license__ = "AGPLv3"
