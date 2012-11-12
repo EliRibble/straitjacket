@@ -33,7 +33,7 @@ def _setup_logging():
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     stream_handler = logging.StreamHandler()
-    formatter = logging.Formatter('[%(levelname)-8s] %(asctime)s %(name)s: %(message)s')
+    formatter = logging.Formatter('[%(levelname)-8s] %(process)-5d %(asctime)s %(name)s: %(message)s')
     stream_handler.setFormatter(formatter)
     root.addHandler(stream_handler)
     root.info("Set up logging")
