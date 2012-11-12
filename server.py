@@ -29,6 +29,16 @@ LOGGER = logging.getLogger('server')
 ROOT_DIRECTORY = os.path.realpath(os.path.dirname(__file__))
 DEFAULT_CONFIG_DIR = os.path.join(ROOT_DIRECTORY, "config")
 
+def _setup_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    stream_handler = logging.StreamHandler()
+    formatter = logging.Formatter('[%(levelname)-8s] %(asctime)s %(name)s: %(message)s')
+    stream_handler.setFormatter(formatter)
+    root.addHandler(stream_handler)
+    root.info("Set up logging")
+_setup_logging()
+
 class JSONWrapper(object):
     def __init__(self, my_json):
         self.json = my_json
