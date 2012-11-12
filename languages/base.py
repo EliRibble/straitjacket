@@ -87,7 +87,7 @@ class LanguageTest(object):
             return False
 
     def test(self):
-        result = self.language.execute( self.source, self.stdin, None )
+        result = self.language.execute( self.source, self.stdin, 5 )
         assert result['status'] == self.status
         if self.status == 'success':
             assert result['runs'][0]['returncode'] == self.returncode

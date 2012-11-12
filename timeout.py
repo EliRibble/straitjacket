@@ -67,12 +67,3 @@ class ProcessTimeout(object):
     @property
     def timedout(self):
         return self.timeout.timedout
-
-@contextmanager
-def ProcessTimeout(seconds, pid):
-    timeout = KillProcessThread(seconds, pid)
-    timeout.run()
-    try:
-        yield
-    finally:
-        timeout.cancel()
