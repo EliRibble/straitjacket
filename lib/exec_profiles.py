@@ -91,10 +91,15 @@ class BaseProfile(object):
         else:
             status = "success"
 
+        # Clean out any incriminating information about our file system
+        if source_file:
+            stdout = stdout.replace(source_file)
+            stderr = stderr.replace(source_file)
+
         return {
             'status'        : status,
-            'stdout'        : stdout.replace(source_file, "<source>") if source_file else stdout,
-            'stderr'        : stderr.replace(source_file, "<source>") if source_file else stderr,
+            'stdout'        : stdout,
+            'stderr'        : stderr,
             'returncode'    : returncode,
             'runtime'       : runtime
         }
@@ -146,11 +151,18 @@ class CompilerProfile(BaseProfile):
             kill_thread.join()
 
             compilation_time = time.time() - compile_start_time
+        
+            compile_out = compile_out.replace(source_file, '<source>') if compile_out else ''
+            compile_err = compile_err.replace(source_file, '<source>') if compile_err else ''
+            
+            compile_out = compile_out.replace(self.config.DIRECTORIES['compiler'], '<tmp_dir>')
+            compile_err = compile_err.replace(self.config.DIRECTORIES['compiler'], '<tmp_dir>')
+
             results = {
                 'compilation'       : {
                     'command'           : ' '.join(command).replace(compiler_file, '<output>').replace(source_file, '<source>'),
-                    'stdout'            : compile_out.replace(source_file, '<source>') if compile_out else '',
-                    'stderr'            : compile_err.replace(source_file, '<source>') if compile_err else '',
+                    'stdout'            : compile_out,
+                    'stderr'            : compile_err,
                     'returncode'        : proc.returncode,
                     'time'              : compilation_time
                 }
