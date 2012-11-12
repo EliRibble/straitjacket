@@ -4,6 +4,7 @@ import os
 import threading
 import errno
 import logging
+import time
 
 from contextlib import contextmanager
 
@@ -61,6 +62,7 @@ class ProcessTimeout(object):
     def __enter__(self):
         LOGGER.debug("Starting timeout process for %s with %s seconds timeout", self.timeout.pid, self.timeout.seconds)
         self.timeout.run()
+        time.sleep(0.01)
 
     def __exit__(self, *args, **kwargs):
         self.timeout.cancel()
