@@ -23,6 +23,7 @@ import os
 import logging
 
 from lib import straitjacket
+import straitjacket_settings
 
 LOGGER = logging.getLogger('server')
 
@@ -71,7 +72,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
             except ValueError:
                 data = web.input()
 
-            timelimit = getattr(data, 'timelimit', None)
+            timelimit = getattr(data, 'timelimit', straitjacket_settings.MAX_RUNTIME)
             timelimit = float(timelimit) if timelimit else None
 
             if hasattr(data, 'stdin'):
