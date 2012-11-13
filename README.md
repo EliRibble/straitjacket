@@ -106,6 +106,8 @@ Set up the web app
 - sudo apt-get purge apport python-apport
 - sudo apt-get install python-pip python-libapparmor
 - sudo pip install web.py
+- sudo mkdir -p /var/webapps/
+- sudo ln -s /home/ubuntu/straitjacket /var/webapps/straitjacket
 - sudo service uwsgi restart
 - At this point if you test the website you should see the main page but
   no code execution will work
