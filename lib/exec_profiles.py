@@ -254,6 +254,9 @@ class VMProfile(BaseProfile):
             f = file(source_file, "w")
             try:
                 f.write(source)
+            except UnicodeEncodeError:
+                LOGGER.warning("Failed to write source file due to encoding error, attempting UTF-8 encoding")
+                f.write(source.encode('utf-8'))
             finally:
                 f.close()
 
