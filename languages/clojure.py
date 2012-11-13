@@ -6,7 +6,7 @@ clojure = Language('Clojure',
     profile                 = exec_profiles.InterpreterProfile(straitjacket_settings),
     version                 = '1.2.1',
     binary                  = 'java',
-    interpretation_command  = lambda source: ['java', '-cp', '/usr/lib/clojure/clojure-1.4.0.jar:/usr/lib/clojure/clojure-1.4.0-slim.jar', 'clojure.main', source],
+    interpretation_command  = lambda source: ['java', '-Xmx256m', '-Xms256m', '-Xss256k', '-cp', '/usr/lib/clojure/clojure-1.4.0.jar:/usr/lib/clojure/clojure-1.4.0-slim.jar', 'clojure.main', source],
     filename                = 'source.clj',
     apparmor_profile        = 'straitjacket/interpreter/clojure')
 
