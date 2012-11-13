@@ -32,7 +32,7 @@ class StraitJacket(object):
         if not skip_language_checks:
             logging.debug("Initialized %d languages", len(self.languages))
 
-    def run(self, language, source, stdin, timelimit=None):
+    def run(self, language, source, stdin, timelimit=30):
         try:
             return self.languages[language].execute(source, stdin, timelimit)
         except KeyError:

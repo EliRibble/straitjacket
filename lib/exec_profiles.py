@@ -182,6 +182,7 @@ class CompilerProfile(BaseProfile):
 
             time_left = timelimit - compilation_time
             per_run_timelimit = time_left / len(stdins)
+            LOGGER.info("Compiled in %d seconds, %d left for %d executions yields %d per execution", compilation_time, time_left, len(stdins), per_run_timelimit)
 
             run_results = [self._run_user_program(["straitjacket-binary"],
                             stdin,
@@ -297,6 +298,7 @@ class VMProfile(BaseProfile):
          
             time_left = timelimit - compilation_time
             per_run_timelimit = time_left / len(stdins)   
+            LOGGER.info("Compiled in %d seconds, %d left for %d executions yields %d per execution", compilation_time, time_left, len(stdins), per_run_timelimit)
             run_results = [self._run_user_program(language.vm_command(source_file),
                                 stdin,
                                 language.vm_apparmor_profile,
