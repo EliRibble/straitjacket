@@ -4,7 +4,7 @@ import straitjacket_settings
 
 javascript = Language('Javascript',
     profile             = exec_profiles.InterpreterProfile(straitjacket_settings),
-    binary              = 'node',
+    binary              = '/usr/local/bin/node',
     filename            = 'source.js',
     apparmor_profile    = 'straitjacket/interpreter/node')
 

@@ -28,10 +28,7 @@ import logging
 from errors import AppArmorProtectionFailure
 from timeout import ProcessTimeout
 
-try:
-    import LibAppArmor
-except ImportError:
-    LibAppArmor = None
+import LibAppArmor
 
 LOGGER = logging.getLogger('execution profiles')
 
@@ -41,9 +38,8 @@ __license__ = "AGPLv3"
 __email__ = "jt@instructure.com"
 
 def aa_change_onexec(profile):
-    if LibAppArmor is None or LibAppArmor.aa_change_onexec(profile) != 0:
-        raise AppArmorProtectionFailure, ("failed to switch to apparmor profile %s"
-                % profile)
+    if LibAppArmor.aa_change_onexec(profile) != 0:
+        raise AppArmorProtectionFailure, ("failed to switch to apparmor profile %s" % profile)
 
 class BaseProfile(object):
 
