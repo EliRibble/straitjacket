@@ -213,7 +213,10 @@ class InterpreterProfile(BaseProfile):
         os.makedirs(dirname)
         try:
             with open(filename, 'w') as f:
-                f.write(source)
+                try:
+                    f.write(source)
+                except UnicodeEncodeError:
+                    f.write(source.encode('utf-8'))
             if language.interpretation_command:
                 command = language.interpretation_command(filename)
             else:
