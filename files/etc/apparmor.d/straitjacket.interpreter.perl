@@ -6,4 +6,7 @@ profile straitjacket/interpreter/perl {
 
   /var/local/straitjacket/tmp/source/?*/?* r,
   /usr/share/perl/** r,
+  /usr/share/perl5/** r,
+  /usr/lib/perl/** r,
+  /usr/lib/perl5/** r,
 }
