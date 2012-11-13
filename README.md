@@ -149,14 +149,26 @@ Install D support
 Install Javascript support
 ##########################
 - apt-get install python g++ make
-- mkdir ~/nodejs && cd $_
 - wget -N http://nodejs.org/dist/node-latest.tar.gz
 - tar xzvf node-latest.tar.gz 
 - cd node-v0.8.14
 - ./configure
 - make
 - sudo make install
-- rm -Rf ~/nodejs
+- rm -Rf ~/node-v0.8.14
+
+Final Tests
+***********
+
+At this point your AMI should be ready. To prove this to yourself you
+should run the language tests with
+
+- cd straitjacket
+- sudo -u www-data py.test tests/test_languages.py
+
+This will show you a dot for every language test that passes and a whole
+bunch of info about ones that fail. If you get nothing but dots, congrats,
+stuff is working
 
 Create new AMI
 **************
