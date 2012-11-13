@@ -140,9 +140,10 @@ Install Clojure support
 Install D support
 #################
 - sudo apt-get install xdg-utils
-- (maybe?) sudo apt-get -f install
 - Get the dmd installation from http://dlang.org/download.html
 - wget http://ftp.digitalmars.com/dmd_2.060-0_amd64.deb
+- sudo dpkg dmd_2.060-0_amd64.deb
+- sudo apt-get -f install
 - sudo dpkg dmd_2.060-0_amd64.deb
 
 Install Javascript support
