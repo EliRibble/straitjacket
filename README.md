@@ -132,7 +132,7 @@ Install Clojure support
 - wget http://repo1.maven.org/maven2/org/clojure/clojure/1.4.0/clojure-1.4.0.zip
 - unzip clojure-1.4.0.zip
 - sudo mkdir /usr/lib/clojure
-- sudo mv clojure-1.4.0/clojure-1.4.0*.jar
+- sudo mv clojure-1.4.0/clojure-1.4.0*.jar /usr/lib/clojure
 - sudo chown root /usr/lib/clojure/*
 - sudo chgrp root /usr/lib/clojure/*
 - sudo chmod +r /usr/lib/clojure/*
