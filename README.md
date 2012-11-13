@@ -1,4 +1,4 @@
-StraitJacket 0.1
+StraitJacket 1.0
 =====
 
 This web application is a (hopefully) safe and secure remote execution
@@ -66,6 +66,94 @@ https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
 Dependencies include:
 
 python-webpy, python-libapparmor, apparmor
+
+Creating AMI from Scratch
+=========================
+
+Start with Ubuntu LTS 12.04
+
+Get the codebase from github
+****************************
+- sudo apt-get update
+- sudo apt-get install git
+- git clone https://github.com/EliRibble/straitjacket.git
+
+Install apparmor profiles
+*************************
+- sudo cp -R straitjacket/files/etc/apparmor.d/* /etc/apparmor.d/
+- sudo service apparmor reload
+
+Install nginx
+*************
+- sudo apt-get install nginx
+- sudo service nginx start
+- At this point you can test that it is working by visiting your
+  server with a web browser. You should get the 'Welcome to nginx!' message
+- sudo cp -R straitjacket/files/etc/nginx/* /etc/nginx
+- sudo rm /etc/nginx/sites-enabled/default
+- sudo ln -s /etc/nginx/sites-available/straitjacket /etc/nginx/sites-enabled/
+- sudo service nginx reload
+- At this point if you test the website it should show a bad gateway
+
+Install uwsgi
+*************
+- sudo apt-get install uwsgi uwsgi-plugin-python
+- sudo cp -R straitjacket/files/etc/uwsgi/* /etc/uwsgi/
+- sudo ln -s /etc/uwsgi/apps-available/straitjacket.ini /etc/uwsgi/apps-enabled/
+
+Set up the web app
+******************
+- sudo apt-get purge apport python-apport
+- sudo apt-get install python-pip python-libapparmor
+- sudo pip install web.py
+- sudo service uwsgi restart
+- At this point if you test the website you should see the main page but
+  no code execution will work
+
+Set up the temp directories
+***************************
+- sudo mkdir -p /var/local/straitjacket/tmp/source
+- sudo mkdir -p /var/local/straitjacket/tmp/compiler
+- sudo mkdir -p /var/local/straitjacket/tmp/execute
+- sudo chown -R www-data /var/local/straitjacket
+- sudo chgrp -R www-data /var/local/straitjacket
+
+Install language support
+************************
+- sudo pip install pytest
+- sudo apt-get install gcc mono-gmcs g++ guile-1.8 ghc lua5.1 ocaml php5 python ruby scala racket golang openjdk-6-jdk gfortran gobjc gnustep gnustep-devel build-essential gnustep-make libgnustep-base-dev tclx ruby1.9.1
+- You should be able to run the language tests from the straitjacket directory with 'sudo -u www-data py.test tests/test_languages.py'
+
+Install Clojure support
+#######################
+- sudo apt-get install unzip
+- wget http://repo1.maven.org/maven2/org/clojure/clojure/1.4.0/clojure-1.4.0.zip
+- unzip clojure-1.4.0.zip
+- sudo mkdir /usr/lib/clojure
+- sudo mv clojure-1.4.0/clojure-1.4.0*.jar
+- sudo chown root /usr/lib/clojure/*
+- sudo chgrp root /usr/lib/clojure/*
+- sudo chmod +r /usr/lib/clojure/*
+
+Install D support
+#################
+- sudo apt-get install xdg-utils
+- (maybe?) sudo apt-get -f install
+- Get the dmd installation from http://dlang.org/download.html
+- wget http://ftp.digitalmars.com/dmd_2.060-0_amd64.deb
+- sudo dpkg dmd_2.060-0_amd64.deb
+
+Install Javascript support
+##########################
+- apt-get install python g++ make
+- mkdir ~/nodejs && cd $_
+- wget -N http://nodejs.org/dist/node-latest.tar.gz
+- tar xzvf node-latest.tar.gz 
+- cd node-v0.8.14
+- ./configure
+- make
+- sudo make install
+- rm -Rf ~/nodejs
 
 AppArmor
 ------

@@ -1,0 +1,27 @@
+server {
+    listen 80;
+
+    server_name straitjacket;
+    
+    include /etc/nginx/proxy.conf;
+
+    location / {
+        uwsgi_read_timeout 60s;
+        proxy_set_header Host $http_host;
+
+        include uwsgi_params;
+
+        if (!-f $request_filename) {
+            uwsgi_pass unix:///run/uwsgi/app/straitjacket/socket;
+            break;
+        }
+    }
+
+    location /static/ {
+        root /var/webapps/straitjacket/;
+    }
+
+    location /crossdomain.xml {
+        root /etc/nginx/crossdomain/;
+    }
+}

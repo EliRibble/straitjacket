@@ -17,78 +17,103 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import web, json, os
+import web
+import json
+import os
+import logging
+
 from lib import straitjacket
+import straitjacket_settings
 
-__author__ = "JT Olds"
-__copyright__ = "Copyright 2011 Instructure, Inc."
-__license__ = "AGPLv3"
-__email__ = "jt@instructure.com"
+LOGGER = logging.getLogger('server')
 
-DEFAULT_CONFIG_DIR = os.path.join(os.path.realpath(os.path.dirname(__file__)),
-    "config")
+ROOT_DIRECTORY = os.path.realpath(os.path.dirname(__file__))
+DEFAULT_CONFIG_DIR = os.path.join(ROOT_DIRECTORY, "config")
 
-INDEX_HTML = """
-<h1>welcome to straitjacket</h1>
-<form method="post" action="/execute">
-<dl>
-<dt>source:</dt><dd><textarea name="source" rows=8 cols=50></textarea></dd>
-<dt>stdin:</dt><dd><textarea name="stdin" rows=8 cols=50></textarea></dd>
-<dt>language:</dt><dd><select name="language">
-%(languages)s
-</select></dd></dl>
-<input type="submit"/>
-</form>
-"""
+def _setup_logging():
+    root = logging.getLogger()
+    root.setLevel(logging.DEBUG)
+    stream_handler = logging.StreamHandler()
+    formatter = logging.Formatter('[%(levelname)-8s] %(process)-5d %(asctime)s %(name)s: %(message)s')
+    stream_handler.setFormatter(formatter)
+    root.addHandler(stream_handler)
+    root.info("Set up logging")
+_setup_logging()
 
-def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR,
-    skip_language_checks=False):
-  if not wrapper:
-    wrapper = straitjacket.StraitJacket(config_dir,
-        skip_language_checks=skip_language_checks)
+class JSONWrapper(object):
+    def __init__(self, my_json):
+        self.json = my_json
 
-  index_html = INDEX_HTML % {"languages": "\n".join(
-      ('<option value="%s">%s - %s</option>' % (lang,
-       wrapper.enabled_languages[lang]["visible_name"],
-       wrapper.enabled_languages[lang]["version"])
-       for lang in sorted(wrapper.enabled_languages)))}
+    def __getattr__(self, name):
+        try:
+            return self.json[name]
+        except KeyError:
+            raise AttributeError
 
-  class index:
-    def GET(self):
-      web.header('Content-Type', 'text/html')
-      return index_html
+def _get_file_content(file_path):
+    with open(file_path, 'r') as f:
+        return f.read()
 
-  class execute:
-    def POST(self):
-      web.header('Content-Type', 'text/plain')
-      f = web.input()
-      timelimit = None
-      if f.has_key("timelimit") and len(f.timelimit) > 0:
-        try: timelimit = float(f.timelimit)
-        except: pass
-      try:
-        stdout, stderr, exitstatus, runtime, error = wrapper.run(f.language,
-            f.source, f.stdin, custom_timelimit=timelimit)
-        return json.dumps({"stdout": stdout, "stderr": stderr,
-            "exitstatus": exitstatus, "time": runtime, "error": error})
-      except straitjacket.InputError: raise web.badrequest()
+def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=False):
+    if not wrapper:
+        wrapper = straitjacket.StraitJacket(skip_language_checks=skip_language_checks)
 
-  class info:
-    def GET(self):
-      web.header('Content-Type', 'text/json')
-      languages = {}
-      for lang in wrapper.enabled_languages:
-        languages[lang] = {
-            "visible_name": wrapper.enabled_languages[lang]["visible_name"],
-            "version": wrapper.enabled_languages[lang]["version"]}
-      return json.dumps({"languages": languages})
 
-  app = web.application((
-      '/', 'index',
-      '/execute', 'execute',
-      '/info', 'info',
-    ), locals())
+    class index: # pylint: disable=W0612
+        def GET(self):
+            return _get_file_content(os.path.join(ROOT_DIRECTORY, 'static/html/index.html'))
 
-  return app
+    class execute: # pylint: disable=W0612
+        def POST(self):
+            web.header('Content-Type', 'text/json')
+            data = web.data()
+            try:
+                data = JSONWrapper(json.loads(data))
+            except ValueError:
+                data = web.input()
 
-if __name__ == "__main__": webapp().run()
+            timelimit = getattr(data, 'timelimit', straitjacket_settings.MAX_RUNTIME)
+            timelimit = float(timelimit) if timelimit else None
+
+            if hasattr(data, 'stdin'):
+                stdin = [data.stdin] if not type(data.stdin) == list else data.stdin
+            else:
+                stdin = [None]
+
+            try:
+                results = wrapper.run(data.language, data.source, stdin, timelimit=timelimit)
+                return json.dumps(results)
+            except straitjacket.InputError as ex:
+                LOGGER.error("Input error: {0}".format(ex))
+                raise web.badrequest()
+            except AttributeError as ex:
+                LOGGER.error("Attribute error: {0}".format(ex))
+                raise web.badrequest()
+
+    class info: # pylint: disable=W0612
+        def GET(self):
+            web.header('Content-Type', 'text/json')
+            language_info = {'languages': {}}
+            for language in wrapper.languages.values():
+                try:
+                    language_info['languages'][language.name] = {
+                            'visible_name' : language.visible_name,
+                            'version'      : language.version
+                    }
+                except OSError as ex:
+                    LOGGER.error("Unable to get language info for %s: %s", language.name, ex)
+
+            return json.dumps(language_info, sort_keys=True)
+
+
+    app = web.application((
+            '/', 'index',
+            '/execute', 'execute',
+            '/info', 'info',
+        ), locals())
+
+    return app
+
+if __name__ == "__main__":
+    webapp().run()
+application = webapp().wsgifunc()

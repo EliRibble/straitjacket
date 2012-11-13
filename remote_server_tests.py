@@ -36,11 +36,8 @@ def test_language(language, server_info, remote_server):
           "stdin": stdin})).read())
     return response["stdout"], response["stderr"], response["exitstatus"], \
         response["time"], response["error"]
-  def log_method(message):
-    print >>sys.stderr, message
 
-  return safe_language_check(config_file, language, remote_call,
-      log_method)
+  return safe_language_check(config_file, language, remote_call)
 
 def test(remote_server):
   server_info = json.loads(urllib2.urlopen("%s/info" % remote_server).read())

@@ -1,13 +1,12 @@
 #include <tunables/global>
 
-profile straitjacket/compiler/scala {
+profile straitjacket/interpreter/clojure {
   #include <abstractions/base>
   #include <abstractions/straitjacket-base>
   #include <abstractions/straitjacket-jvm>
 
   /bin/uname rix,
-  /usr/bin/scalac rix,
   /usr/lib/jvm/*/bin/java rix,
-  /var/local/straitjacket/tmp/source/?*/?* rw,
-
+  /var/local/straitjacket/tmp/source/?*/?* r,
+  /usr/lib/clojure/* r,
 }
