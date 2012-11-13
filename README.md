@@ -121,7 +121,7 @@ Set up the temp directories
 Install language support
 ************************
 - sudo pip install pytest
-- sudo apt-get install gcc mono-gmcs g++ guile-1.8 ghc lua5.1 ocaml php5 python ruby scala racket golang openjdk-6-jdk gfortran gobjc gnustep gnustep-devel build-essential gnustep-make libgnustep-base-dev tclx
+- sudo apt-get install gcc mono-gmcs g++ guile-1.8 ghc lua5.1 ocaml php5 python ruby scala racket golang openjdk-6-jdk gfortran gobjc gnustep gnustep-devel build-essential gnustep-make libgnustep-base-dev tclx ruby1.9.1
 - You should be able to run the language tests from the straitjacket directory with 'sudo -u www-data py.test tests/test_languages.py'
 
 Install Clojure support
