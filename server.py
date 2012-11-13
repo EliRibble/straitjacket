@@ -93,7 +93,7 @@ def webapp(wrapper=None, config_dir=DEFAULT_CONFIG_DIR, skip_language_checks=Fal
     class info: # pylint: disable=W0612
         def GET(self):
             web.header('Content-Type', 'text/json')
-language_info = {'languages': {}}
+            language_info = {'languages': {}}
             for language in wrapper.languages.values():
                 try:
                     language_info['languages'][language.name] = {
