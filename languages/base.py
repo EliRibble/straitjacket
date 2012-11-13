@@ -1,6 +1,8 @@
-
+import logging
 import subprocess
 import re
+
+LOGGER = logging.getLogger('languages.base')
 
 class Language(object):
     def __init__(self,
@@ -49,8 +51,13 @@ class Language(object):
         return self._version
 
     def get_version(self):
-        proc = subprocess.Popen([self.binary, self.version_switch], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        stdout = proc.communicate()[0]
+        try:
+	    proc = subprocess.Popen([self.binary, self.version_switch], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            stdout = proc.communicate()[0]
+        except OSError as err:
+            LOGGER.exception("Unable to get version information for %s", self.name)
+            return "error"
+	
         if self.version_pattern:
             m = re.search(self.version_pattern, stdout)
             if m:
