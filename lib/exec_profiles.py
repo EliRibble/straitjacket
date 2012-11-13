@@ -93,8 +93,8 @@ class BaseProfile(object):
 
         # Clean out any incriminating information about our file system
         if source_file:
-            stdout = stdout.replace(source_file)
-            stderr = stderr.replace(source_file)
+            stdout = stdout.replace(source_file, '<source>')
+            stderr = stderr.replace(source_file, '<source>')
 
         return {
             'status'        : status,
