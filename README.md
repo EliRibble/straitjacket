@@ -1,4 +1,4 @@
-StraitJacket 1.01
+StraitJacket 1.02
 =================
 
 This web application is a (hopefully) safe and secure remote execution
