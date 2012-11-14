@@ -122,7 +122,7 @@ class CompilerProfile(BaseProfile):
         try:
             os.mkdir(source_dir)
             with open(source_file, 'w') as f:
-                f.write(source)
+                f.write(source.encode('utf-8'))
             logging.debug("Wrote the following source to %s: %s", source_file, source)
 
             completed = []
@@ -213,10 +213,7 @@ class InterpreterProfile(BaseProfile):
         os.makedirs(dirname)
         try:
             with open(filename, 'w') as f:
-                try:
-                    f.write(source)
-                except UnicodeEncodeError:
-                    f.write(source.encode('utf-8'))
+                f.write(source.encode('utf-8'))
             if language.interpretation_command:
                 command = language.interpretation_command(filename)
             else:
@@ -252,9 +249,6 @@ class VMProfile(BaseProfile):
             os.mkdir(source_dir)
             f = file(source_file, "w")
             try:
-                f.write(source)
-            except UnicodeEncodeError:
-                LOGGER.warning("Failed to write source file due to encoding error, attempting UTF-8 encoding")
                 f.write(source.encode('utf-8'))
             finally:
                 f.close()
