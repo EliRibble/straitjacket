@@ -6,7 +6,7 @@ server {
     include /etc/nginx/proxy.conf;
 
     location / {
-        uwsgi_read_timeout 60s;
+        uwsgi_read_timeout 58s;
         proxy_set_header Host $http_host;
 
         include uwsgi_params;

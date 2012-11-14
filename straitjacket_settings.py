@@ -5,7 +5,7 @@
 # This means that if the user passes in 100 values for
 # stdin then we must run the program 100 times within
 # this time out
-MAX_RUNTIME = 60
+MAX_RUNTIME = 54
 
 DIRECTORIES = {
     'temp_root' : '/var/local/straitjacket/tmp',
