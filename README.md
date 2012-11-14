@@ -1,5 +1,5 @@
-StraitJacket 1.0
-=====
+StraitJacket 1.01
+=================
 
 This web application is a (hopefully) safe and secure remote execution
 environment framework. It builds on top of Linux' AppArmor system calls and as
