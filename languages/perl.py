@@ -7,7 +7,7 @@ perl = Language('Perl',
     binary              = 'perl',
     version_pattern     = '\(v(?P<version>[\d\.]+)\)',
     filename            = 'source.pl',
-    apparmor_profile    = 'straitjacket/interpreter/default')
+    apparmor_profile    = 'straitjacket/interpreter/perl')
 
 LanguageTest('test-simple', perl,
     source      = ( "$message = 'hello from perl';                               \n"

@@ -1,5 +1,5 @@
-StraitJacket 1.0
-=====
+StraitJacket 1.01
+=================
 
 This web application is a (hopefully) safe and secure remote execution
 environment framework. It builds on top of Linux' AppArmor system calls and as
@@ -106,6 +106,8 @@ Set up the web app
 - sudo apt-get purge apport python-apport
 - sudo apt-get install python-pip python-libapparmor
 - sudo pip install web.py
+- sudo mkdir -p /var/webapps/
+- sudo ln -s /home/ubuntu/straitjacket /var/webapps/straitjacket
 - sudo service uwsgi restart
 - At this point if you test the website you should see the main page but
   no code execution will work
@@ -130,7 +132,7 @@ Install Clojure support
 - wget http://repo1.maven.org/maven2/org/clojure/clojure/1.4.0/clojure-1.4.0.zip
 - unzip clojure-1.4.0.zip
 - sudo mkdir /usr/lib/clojure
-- sudo mv clojure-1.4.0/clojure-1.4.0*.jar
+- sudo mv clojure-1.4.0/clojure-1.4.0*.jar /usr/lib/clojure
 - sudo chown root /usr/lib/clojure/*
 - sudo chgrp root /usr/lib/clojure/*
 - sudo chmod +r /usr/lib/clojure/*
@@ -138,22 +140,63 @@ Install Clojure support
 Install D support
 #################
 - sudo apt-get install xdg-utils
-- (maybe?) sudo apt-get -f install
 - Get the dmd installation from http://dlang.org/download.html
 - wget http://ftp.digitalmars.com/dmd_2.060-0_amd64.deb
+- sudo dpkg dmd_2.060-0_amd64.deb
+- sudo apt-get -f install
 - sudo dpkg dmd_2.060-0_amd64.deb
 
 Install Javascript support
 ##########################
 - apt-get install python g++ make
-- mkdir ~/nodejs && cd $_
 - wget -N http://nodejs.org/dist/node-latest.tar.gz
 - tar xzvf node-latest.tar.gz 
 - cd node-v0.8.14
 - ./configure
 - make
 - sudo make install
-- rm -Rf ~/nodejs
+- rm -Rf ~/node-v0.8.14
+
+Final Tests
+***********
+
+At this point your AMI should be ready. To prove this to yourself you
+should run the language tests with
+
+- cd straitjacket
+- sudo -u www-data py.test tests/test_languages.py
+
+This will show you a dot for every language test that passes and a whole
+bunch of info about ones that fail. If you get nothing but dots, congrats,
+stuff is working
+
+Create new AMI
+**************
+
+If you are going to use this to create an AMI the following may be helpful
+- Make sure you have a secret key and associated signing certificate. Do this on somewhere other than the EC2 instance you are turning into an AMI
+    - openssl genrsa 2048 > my_key.pem
+    - openssl req -new -key my_key.pem -out my_key.cert
+- scp -i <some ssh key> my_key.pem ubuntu@<ec2 instance>:/home/ubuntu
+- scp -i <some ssh key> my_key.cert ubuntu@<ec2 instance>:/home/ubuntu
+- SSH in to the EC2 instance
+- sudo mv my_key.* /mnt/
+- Enable the multiverse repos by un-commenting the lines in /etc/apt/sources.list
+    33 deb http://us-east-1.ec2.archive.ubuntu.com/ubuntu/ precise multiverse
+    34 deb-src http://us-east-1.ec2.archive.ubuntu.com/ubuntu/ precise multiverse
+    35 deb http://us-east-1.ec2.archive.ubuntu.com/ubuntu/ precise-updates multiverse
+    36 deb-src http://us-east-1.ec2.archive.ubuntu.com/ubuntu/ precise-updates multiverse
+    59 deb http://security.ubuntu.com/ubuntu precise-security multiverse
+    60 deb-src http://security.ubuntu.com/ubuntu precise-security multiverse
+- sudo apt-add-repository ppa:awstools-dev/awstools
+- sudo apt-get update
+- sudo apt-get install ec2-api-tools ec2-ami-tools
+- sudo -E ec2-bundle-vol -r x86_64 -d /mnt -p straitjacket-1.0-instance-store -u <Your AWS user ID which is a 12 digit number> -k /mnt/my_key.pem -c /mnt/my_key.cert -s 10240 -e /mnt,/root/.ssh,/home/ubuntu/.ssh
+- ec2-upload-bundle -b <bucket-name> -m /mnt/straitjacket-1.0-instance-store.manifest.xml -a <AWS Access Key> -s <AWS Secret Key>
+- ec2-register --name '<bucket-name>/straitjacket-1.0-instance-store' <bucket-name>/straitjacket-1.0-instance-store.manifest.xml -K /mnt/my_key.pem -C /mnt/my_key.cert
+- This should output the new AMI ID of your brand-new minted AMI!
+
+    
 
 AppArmor
 ------
