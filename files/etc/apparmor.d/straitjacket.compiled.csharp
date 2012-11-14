@@ -10,5 +10,6 @@ profile straitjacket/compiled/csharp {
 
   /var/local/straitjacket/lib/getpwuid_r_hijack.so rm,
   /var/local/straitjacket/tmp/source/?*/?* r,
+  /etc/passwd r,
 
 }

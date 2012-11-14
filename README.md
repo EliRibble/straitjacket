@@ -217,17 +217,6 @@ stages of execution, all (configurably) prefixed by /var/local/straitjacket.
 Please take a look at both config/global.conf and install.py (which currently
 only can be relied upon to make these directories for you, unfortunately).
 
-LD_PRELOAD hacks
--------
-
-Some languages (c#) require access to the getpwuid_r system call, which reads
-/etc/passwd, which is disallowed by AppArmor, which promptly fails, causing
-the runtime to bail. To counteract this without actually just adding /etc/passwd
-read access, there is a getpwuid_r LD_PRELOAD library in the src/ directory.
-
-The current config/lang-c#.conf file expects the getpwuid_r_hijack.so module
-that can be built in the src/ directory to be in /var/local/straitjacket/lib/
-
 Web
 -----
 
