@@ -1,4 +1,4 @@
-StraitJacket 1.01
+StraitJacket 1.02
 =================
 
 This web application is a (hopefully) safe and secure remote execution
@@ -177,8 +177,8 @@ If you are going to use this to create an AMI the following may be helpful
 - Make sure you have a secret key and associated signing certificate. Do this on somewhere other than the EC2 instance you are turning into an AMI
     - openssl genrsa 2048 > my_key.pem
     - openssl req -new -key my_key.pem -out my_key.cert
-- scp -i <some ssh key> my_key.pem ubuntu@<ec2 instance>:/home/ubuntu
-- scp -i <some ssh key> my_key.cert ubuntu@<ec2 instance>:/home/ubuntu
+- scp -i some-ssh-key my_key.pem ubuntu@ec2-instance:/home/ubuntu
+- scp -i some-ssh-key my_key.cert ubuntu@ec2-instance:/home/ubuntu
 - SSH in to the EC2 instance
 - sudo mv my_key.* /mnt/
 - Enable the multiverse repos by un-commenting the lines in /etc/apt/sources.list
@@ -191,9 +191,9 @@ If you are going to use this to create an AMI the following may be helpful
 - sudo apt-add-repository ppa:awstools-dev/awstools
 - sudo apt-get update
 - sudo apt-get install ec2-api-tools ec2-ami-tools
-- sudo -E ec2-bundle-vol -r x86_64 -d /mnt -p straitjacket-1.0-instance-store -u <Your AWS user ID which is a 12 digit number> -k /mnt/my_key.pem -c /mnt/my_key.cert -s 10240 -e /mnt,/root/.ssh,/home/ubuntu/.ssh
-- ec2-upload-bundle -b <bucket-name> -m /mnt/straitjacket-1.0-instance-store.manifest.xml -a <AWS Access Key> -s <AWS Secret Key>
-- ec2-register --name '<bucket-name>/straitjacket-1.0-instance-store' <bucket-name>/straitjacket-1.0-instance-store.manifest.xml -K /mnt/my_key.pem -C /mnt/my_key.cert
+- sudo -E ec2-bundle-vol -r x86_64 -d /mnt -p straitjacket-1.0-instance-store -u Your-AWS-user-ID-which-is-a-12-digit-number -k /mnt/my_key.pem -c /mnt/my_key.cert -s 10240 -e /mnt,/root/.ssh,/home/ubuntu/.ssh
+- ec2-upload-bundle -b bucket-name -m /mnt/straitjacket-1.0-instance-store.manifest.xml -a AWS-Access-Key -s AWS-Secret-Key
+- ec2-register --name 'bucket-name/straitjacket-1.0-instance-store' bucket-name/straitjacket-1.0-instance-store.manifest.xml -K /mnt/my_key.pem -C /mnt/my_key.cert
 - This should output the new AMI ID of your brand-new minted AMI!
 
     
@@ -216,17 +216,6 @@ There are a number of system directories StraitJacket uses for intermediate
 stages of execution, all (configurably) prefixed by /var/local/straitjacket.
 Please take a look at both config/global.conf and install.py (which currently
 only can be relied upon to make these directories for you, unfortunately).
-
-LD_PRELOAD hacks
--------
-
-Some languages (c#) require access to the getpwuid_r system call, which reads
-/etc/passwd, which is disallowed by AppArmor, which promptly fails, causing
-the runtime to bail. To counteract this without actually just adding /etc/passwd
-read access, there is a getpwuid_r LD_PRELOAD library in the src/ directory.
-
-The current config/lang-c#.conf file expects the getpwuid_r_hijack.so module
-that can be built in the src/ directory to be in /var/local/straitjacket/lib/
 
 Web
 -----

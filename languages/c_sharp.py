@@ -8,7 +8,7 @@ c_sharp = Language('C#',
     filename                    = 'source.cs',
     version_switch              = '--version',
     compilation_command         = lambda source: ["mono", "/usr/lib/mono/2.0/gmcs.exe", "-out:main.exe", source],
-    vm_command                  = lambda source: ['env', "LD_PRELOAD=/var/local/straitjacket/lib/getpwuid_r_hijack.so", "mono", "main.exe"],
+    vm_command                  = lambda source: ['env', "mono", "main.exe"],
     compiler_apparmor_profile   = 'straitjacket/compiler/csharp',
     vm_apparmor_profile         = 'straitjacket/compiled/csharp'
 )
